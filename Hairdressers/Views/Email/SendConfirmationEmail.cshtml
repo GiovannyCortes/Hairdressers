@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Verificar email";
+    //string userEmail = ViewData["UserEmail"];
+    string userName = "Giovanny";
+    string userEmail = "gioseinder13@gmail.com";
+}
+
+<form method="post">
+    <label>
+        Se enviará un código de verificación al correo <strong>@userEmail</strong>
+    </label>
+    <input type="hidden" value="@userName" name="receiver" />
+    <input type="hidden" value="@userEmail" name="email"/>
+    <button>
+        Enviar correo
+    </button>
+</form>
+
+<img src='~/images/company_banner.jpg' alt='Company banner image' style='width:100%;'/>
