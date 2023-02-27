@@ -2,13 +2,24 @@
 <html>
 <head>
     <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/main.css">
 </head>
 <body onunload="HandleOnClose()">
-    <h1>PLANTILLA PRINCIPAL MVC CORE</h1>
-    <hr />
-    <div style="background-color:red">
-        <p>ZONA DE VISTAS</p>
-    </div>
+    <header>
+        <div id="navbar_container" class="shadow">
+            <ul id="navbar_list">
+                <li>
+                    <a asp-controller="Landing" asp-action="Index">Home</a>
+                </li>
+                <li>
+                    <a asp-controller="Landing" asp-action="Index">Login</a>
+                </li>
+                <li>
+                    <a asp-controller="Landing" asp-action="Index">Help</a>
+                </li>
+            </ul>
+        </div>
+    </header>
     @RenderBody()
 </body>
 </html>

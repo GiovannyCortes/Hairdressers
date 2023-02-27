@@ -15,7 +15,8 @@ var app = builder.Build();
 
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Email}/{action=SendConfirmationEmail}"
+        pattern: "{controller=Landing}/{action=Index}"
+        //pattern: "{controller=Email}/{action=SendConfirmationEmail}"
     );
 
 app.Run();
