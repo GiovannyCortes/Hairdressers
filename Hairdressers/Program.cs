@@ -4,6 +4,10 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options => {
         options.IdleTimeout = TimeSpan.FromSeconds(10);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        //options.Cookie.IsEssential = true;
+        //options.IdleTimeout = TimeSpan.FromSeconds(10);
     });
 
 // Inyectamos el archivo appsettings.json como configuración del IConfiguration
