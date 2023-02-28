@@ -16,6 +16,14 @@ header {
     /*background-color: green;*/
 }
 
+#navbar_logo {
+    height: 80%;
+    margin-left: 25px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 #navbar_list {
     display: flex;
     justify-content: space-between;
