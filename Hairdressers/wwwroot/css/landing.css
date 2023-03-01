@@ -1,0 +1,84 @@
+﻿.title_1 {
+    color: white;
+    background-color: rgba(0,0,0,0.5);
+    font-size: 40px;
+    margin: 15px auto;
+    padding-block: 5px;
+    display: inline-block;
+    width: 100vw;
+    text-align: center;
+}
+
+.no_select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#landing_content {
+    width: 90vw;
+    margin-inline: auto;
+    height: calc(100vh - 180px);
+    /*background-color: red;*/
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: "x sidetext";
+}
+
+#image_content {
+    grid-area: image;
+    justify-self: center;
+}
+
+#description_content {
+    grid-area: sidetext;
+    justify-self: center;
+    padding: 20px;
+    text-align: justify;
+    font-size: 12pt;
+    background-color: white;
+    border-radius: 25px;
+    overflow: hidden;
+    animation-name: showcase;
+    animation-duration: 5s;
+    animation-timing-function: ease-in-out;
+    -webkit-transition: all 0.9s ease-in-out;
+    -webkit-animation-name: showcase;
+    -webkit-animation-duration: 3s;
+    -webkit-animation-timing-function: ease-in-out;
+}
+
+#description_content > button {
+    width: 50%;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 25px;
+    box-shadow: 0 1px 5px 0px rgba(100, 100, 100, 0.5);
+    text-align: center;
+    color: white;
+    background-color: var(--main-blue);
+    font-weight: bold;
+    cursor: pointer;
+    transition-duration: 200ms;
+    display: block;
+    margin: 5% auto 0 auto;
+}
+
+#description_content > button:hover {
+    box-shadow: 0 2px 5px 1px rgba(100, 100, 100, 0.8);
+    background-color: var(--main-red);
+}
+
+@keyframes showcase {
+    0% {
+        height: 1%;
+        overflow: hidden;
+    }
+
+    100% {
+        height: calc(100vh - 220px);
+        overflow: hidden;
+    }
+}

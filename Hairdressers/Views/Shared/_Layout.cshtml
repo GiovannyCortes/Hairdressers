@@ -2,23 +2,40 @@
 <html>
 <head>
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/main.css">
+    <link rel="stylesheet" href="~/css/common.css">
+    <link rel="stylesheet" href="~/css/colors.css">
+    <link rel="stylesheet" href="~/css/header.css">
+    <link rel="stylesheet" href="~/css/landing.css">
 </head>
-<body onunload="HandleOnClose()">
+<body>
+    <video autoplay muted loop id="bkg_video_1">
+        <source src="~/movies/hairdresser_movie_6.mp4" type="video/mp4">
+    </video>
     <header>
         <div id="navbar_container" class="shadow">
             <img id="navbar_logo" src="~/images/logo/Barber_logo_medium_transparent.png"/>
-            <ul id="navbar_list">
-                <li class="navbar_list_item">
-                    <a asp-controller="Landing" asp-action="Index">Home</a>
-                </li>
-                <li class="navbar_list_item">
-                    <a asp-controller="Landing" asp-action="Index">Login</a>
-                </li>
-                <li class="navbar_list_item">
-                    <a asp-controller="Landing" asp-action="Index">Help</a>
-                </li>
-            </ul>
+            <div id="ncontainer_div2">
+                <ul class="navbar_list rel_center no_select">
+                    <li>
+                        <a asp-controller="Landing" asp-action="Index" class="navbar_list_item">Home</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Landing" asp-action="Index" class="navbar_list_item">Other</a>
+                    </li>
+                    <li>
+                        <a asp-controller="Landing" asp-action="Index" class="navbar_list_item">Help</a>
+                    </li>
+                </ul>
+            </div>
+            <div id="ncontainer_div3">
+                <ul class="navbar_list rel_center no_select">
+                    <li>
+                        <button id="navbar_user" class="navbar_list_item">
+                            <img src="~/images/user.png" style="height: 100%;"/>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </header>
     @RenderBody()
