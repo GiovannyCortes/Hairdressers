@@ -23,8 +23,9 @@
     /*background-color: red;*/
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-    grid-template-areas: "x sidetext";
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas: "x x" "sidetext y";
+    grid-gap: 20px;
 }
 
 #image_content {
@@ -41,13 +42,6 @@
     background-color: white;
     border-radius: 25px;
     overflow: hidden;
-    animation-name: showcase;
-    animation-duration: 5s;
-    animation-timing-function: ease-in-out;
-    -webkit-transition: all 0.9s ease-in-out;
-    -webkit-animation-name: showcase;
-    -webkit-animation-duration: 3s;
-    -webkit-animation-timing-function: ease-in-out;
 }
 
 #description_content > button {
@@ -69,16 +63,4 @@
 #description_content > button:hover {
     box-shadow: 0 2px 5px 1px rgba(100, 100, 100, 0.8);
     background-color: var(--main-red);
-}
-
-@keyframes showcase {
-    0% {
-        height: 1%;
-        overflow: hidden;
-    }
-
-    100% {
-        height: calc(100vh - 220px);
-        overflow: hidden;
-    }
 }
