@@ -1,4 +1,19 @@
-﻿body {
+﻿@font-face {
+    font-family: Monofonto;
+    src: url("../../fonts/monofonto.otf");
+}
+
+@font-face {
+    font-family: Roboto;
+    src: url("../../fonts/Roboto/Roboto-Regular.ttf");
+}
+
+* {
+    margin: 0;
+    font-family: Roboto;
+}
+
+body {
     background: black;
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
@@ -19,6 +34,10 @@ body::-webkit-scrollbar {
     -webkit-box-shadow: 0 6px 5px -2px rgb(10, 10, 10);
     -moz-box-shadow: 0 6px 5px -2px rgb(10, 10, 10);
     box-shadow: 0 5px 9px -2px rgb(10, 10, 10);
+}
+
+.text-shadow {
+    text-shadow: 0 0 6px rgb(200 200 200);
 }
 
 .no_select {

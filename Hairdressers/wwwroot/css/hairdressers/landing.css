@@ -1,45 +1,58 @@
-﻿.title_1 {
-    color: white;
-    background-color: rgba(0,0,0,0.5);
-    font-size: 40px;
-    margin: 15px auto;
-    padding-block: 5px;
-    display: inline-block;
-    width: 100vw;
-    text-align: center;
-}
-
-.no_select {
+﻿.no_select {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-#landing_content {
-    width: 90vw;
-    margin-inline: auto;
-    height: calc(100vh - 180px);
-    /*background-color: red;*/
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    grid-template-areas: "x x" "sidetext y";
-    grid-gap: 20px;
+@media screen and (orientation: landscape) and (max-width: 1300px) {
+    #landing_content {
+        width: 90vw;
+        margin-inline: auto;
+        height: calc(100vh - 180px);
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "sidetext";
+        grid-gap: 0px;
+        overflow: hidden;
+    }
 }
 
-#image_content {
-    grid-area: image;
+@media screen and (orientation: landscape) and (min-width: 1300px) {
+    #landing_content {
+        width: 90vw;
+        margin-inline: auto;
+        height: calc(100vh - 180px);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "sidetext x";
+        grid-gap: 120px;
+        overflow: hidden;
+    }
+}
+
+#sidetext {
+    grid-area: sidetext;
+    align-self: center;
+}
+
+#title_landing {
     justify-self: center;
+    align-self: center;
+    text-align: center;
+    color: white;
+    font-size: 12em;
+    font-family: Roboto;
 }
 
 #description_content {
-    grid-area: sidetext;
     justify-self: center;
     padding: 20px;
     text-align: justify;
     font-size: 12pt;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 25px;
     overflow: hidden;
 }
@@ -57,10 +70,24 @@
     cursor: pointer;
     transition-duration: 200ms;
     display: block;
-    margin: 5% auto 0 auto;
+    margin: 15px auto 0 auto;
 }
 
 #description_content > button:hover {
     box-shadow: 0 2px 5px 1px rgba(100, 100, 100, 0.8);
     background-color: var(--main-red);
+}
+
+#landing_aside{
+    background-color: var(--main-blue);
+    height: 500px;
+    width: 100vw;
+}
+
+#landing_aside > h1 {
+    margin: 15px auto;
+    padding-block: 15px;
+    text-align: center;
+    font-size: 40px;
+    color: white;
 }

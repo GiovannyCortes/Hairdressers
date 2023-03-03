@@ -15,7 +15,9 @@
     </video>
     <header>
         <div id="navbar_container" class="shadow">
-            <img id="navbar_logo" src="~/images/logo/Barber_logo_medium_transparent.png"/>
+            <div id="ncontainer_div1">
+                <img id="navbar_logo" src="~/images/logo/Barber_logo_medium_transparent.png"/>
+            </div>
             <div id="ncontainer_div2">
                 <ul class="navbar_list rel_center no_select">
                     <li>
@@ -35,12 +37,15 @@
                         <button id="navbar_user" class="navbar_list_item">
                             <img src="~/images/user.png" style="height: 100%;"/>
                         </button>
+                        <ul id="flotante">
+                            <li>Iniciar Sesión</li>
+                            <li>Registrarme</li>
+                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
     </header>
     @RenderBody()
-    @RenderSection("mobiscroll", false)
 </body>
 </html>
