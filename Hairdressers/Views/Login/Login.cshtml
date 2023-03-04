@@ -1,0 +1,20 @@
+﻿@{
+    string? login_status = ViewData["VERIFICATION"] as string;
+}
+<div id="background"></div>
+<div id="login_content">
+    <h1 class="title_form no_select">INICIO DE SESIÓN</h1>
+    <form method="post" class="main_forms">
+        @Html.AntiForgeryToken()
+        <label class="login-label" for="email-control-login">Email</label>
+        <input type="email" id="email-control-login" class="login-control" name="email" value="giovannycortes@gmail.com" maxlength="50" required />
+        <label class="login-label" for="password-control-login">Contraseña</label>
+        <input type="password" id="password-control-login" class="login-control" name="password" value="MCSD2023" maxlength="50" required />
+        @if (login_status != null && login_status == "1") {
+            <h3 class="form-error-message">Credenciales incorrectas</h3>
+        }
+        <button class="form-button-submit">
+            <span>Iniciar sesión</span>
+        </button>
+    </form>
+</div>

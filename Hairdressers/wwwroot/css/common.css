@@ -18,6 +18,7 @@ body {
     -ms-overflow-style: none; /* for Internet Explorer, Edge */
     scrollbar-width: none; /* for Firefox */
     overflow-y: scroll;
+    margin-top: 60px;
 }
 
 body::-webkit-scrollbar {
@@ -47,12 +48,13 @@ body::-webkit-scrollbar {
     user-select: none;
 }
 
-#bkg_video_1 {
+#bkg_video {
     position: absolute;
     right: 0;
     bottom: 0;
-    min-width: 100vw;
     min-height: 100vh;
+    min-width: 100vw;
     z-index: -1;
-    opacity: 0.5;
+    -webkit-filter: opacity(0.5);
+    filter: opacity(0.5);
 }

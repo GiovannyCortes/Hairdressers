@@ -1,0 +1,149 @@
+﻿@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-10px);
+    }
+
+    40% {
+        transform: translateX(10px);
+    }
+
+    60% {
+        transform: translateX(-10px);
+    }
+
+    80% {
+        transform: translateX(10px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+#background {
+    background-color: var(--main-blue);
+    /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.togglePassword {
+    cursor: pointer;
+    position: relative;
+    left: -24px;
+    bottom: -1px;
+}
+
+.pass-item {
+    transform: translateX(10px);
+}
+
+.title_form {
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 5px rgb(0 0 0);
+    font-size: 2.8em;
+    padding-block: 25px;
+}
+
+.main_forms {
+    background-color: white;
+    border-radius: 25px;
+    margin: auto auto 25px auto;
+    width: clamp(400px, 60vw, 1080px);
+    /*height: clamp(200px, 60vh, 600px);*/
+    overflow: hidden;
+    text-align: center;
+}
+
+.login-label {
+    display: inline-block;
+    padding: 5px 15px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 1em;
+}
+
+.login-control {
+    width: 80%;
+    margin: auto;
+    display: inline-block;
+    line-height: 1.8em;
+    font-size: 0.9em;
+}
+
+.registrer-control:first-child {
+    margin-block: 28px 15px;
+}
+
+.registrer-control {
+    margin-block: 15px;
+}
+
+.form-error-message {
+    text-align: center;
+    margin: 10px auto;
+    color: red;
+    animation: shake 1s;
+}
+
+.form-button-submit {
+    display: block;
+    width: 150px;
+    height: 50px;
+    margin: 15px auto;
+    border-radius: 10px;
+    border: 1px solid var(--main-gray);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s ease-in;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.form-button-submit::before,
+.form-button-submit::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 100%;
+    transform: skew(15deg);
+    transition: all 0.5s;
+    overflow: hidden;
+    z-index: -1;
+}
+
+.form-button-submit::before {
+    left: -10px;
+    background: rgb(65,80,115);
+}
+
+.form-button-submit::after {
+    right: -10px;
+    background: rgb(156,72,81);
+}
+
+.form-button-submit:hover::before,
+.form-button-submit:hover::after {
+    width: 58%;
+}
+
+.form-button-submit span {
+    color: var(--main-gray);
+    font-size: 18px;
+    transition: all 0.3s ease-in;
+}
+
+.form-button-submit:hover span {
+    color: white;
+    transition: 0.3s;
+}

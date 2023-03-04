@@ -2,17 +2,17 @@
 <html>
 <head>
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/hairdressers/common.css"/>
-    <link rel="stylesheet" href="~/css/hairdressers/colors.css"/>
-    <link rel="stylesheet" href="~/css/hairdressers/header.css"/>
-    <link rel="stylesheet" href="~/css/hairdressers/landing.css"/>
-    <link rel="stylesheet" href="css/mobiscroll/mobiscroll.javascript.min.css" />
-    <script src="js/mobiscroll.javascript.min.js"></script>
+    <link rel="stylesheet" href="~/css/colors.css"/>
+    <link rel="stylesheet" href="~/css/common.css"/>
+    <link rel="stylesheet" href="~/css/header.css"/>
+    <link rel="stylesheet" href="~/css/footer.css"/>
+    <link rel="stylesheet" href="~/css/landing.css"/>
+    <link rel="stylesheet" href="~/css/login.css"/>
+    <link rel="icon" type="image/x-icon" href="~/images/logo/Barber_logo_small_white.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <script src="~/js/jquery-3.6.3.min.js"></script>
 </head>
 <body>
-    <video autoplay muted loop id="bkg_video_1">
-        <source src="~/movies/hairdresser_movie_6.mp4" type="video/mp4">
-    </video>
     <header>
         <div id="navbar_container" class="shadow">
             <div id="ncontainer_div1">
@@ -37,9 +37,35 @@
                         <button id="navbar_user" class="navbar_list_item">
                             <img src="~/images/user.png" style="height: 100%;"/>
                         </button>
-                        <ul id="flotante">
-                            <li>Iniciar Sesión</li>
-                            <li>Registrarme</li>
+                        <ul id="navbar_float">
+                            @if (Context.Session.GetString("VALIDATION") != null) {
+                                <li>
+                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items" id="navbar_float_first">
+                                        Panel de control
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items">
+                                        Citas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Redirect" asp-action="LogOut" class="navbar_float_items" id="navbar_float_last">
+                                        Cerrar sesión
+                                    </a>
+                                </li>
+                            } else {
+                                <li>
+                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items" id="navbar_float_first">
+                                        Iniciar Sesión
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Login" asp-action="Registrer" class="navbar_float_items" id="navbar_float_last">
+                                        Registrarme
+                                    </a>
+                                </li>
+                            }
                         </ul>
                     </li>
                 </ul>
@@ -47,5 +73,59 @@
         </div>
     </header>
     @RenderBody()
+    <footer class="footer">
+        <div class="footer__addr">
+            <h1 class="footer__logo">Cut&Go S.A.</h1>
+            <h2>Contáctanos</h2>
+            <address>
+                C. de Pío Felipe, 12, 28038 Madrid<br>
+                cutandgo.app@gmail.com<br>
+                <a class="footer__btn" href="mailto:example@gmail.com">Enviar email</a>
+            </address>
+        </div>
+
+        <ul class="footer__nav">
+            <li class="nav__item">
+                <h2 class="nav__title">Peluquerías</h2>
+                <ul class="nav__ul">
+                    <li><a href="#">Panel de control</a></li>
+                    <li><a href="#">Gestión de citas</a></li>
+                    <li><a href="#">Archivos</a></li>
+                </ul>
+            </li>
+
+            <li class="nav__item">
+                <h2 class="nav__title">Clientes</h2>
+                <ul class="nav__ul">
+                    <li><a href="#">Panel de control</a></li>
+                    <li><a href="#">Mis citas</a></li>
+                </ul>
+            </li>
+
+            <li class="nav__item">
+                <h2 class="nav__title">Legal</h2>
+                <ul class="nav__ul">
+                    <li><a href="#">Política de privacidad</a></li>
+                    <li><a href="#">Términos de uso</a></li>
+                </ul>
+            </li>
+        </ul>
+
+        <div class="legal">
+            <p>&copy; 2023 Cut&Go. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    @if (IsSectionDefined("registrer_script")) {
+        @RenderSection("registrer_script", false)
+    }
+    <script>
+        $(document).ready(function() {
+            $("#navbar_float").hide();
+
+            $("#navbar_user").click(function() {
+                  $("#navbar_float").slideToggle();
+            });
+        });
+    </script>
 </body>
 </html>

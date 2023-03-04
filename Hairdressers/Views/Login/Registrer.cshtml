@@ -1,0 +1,44 @@
+﻿<div id="background"></div>
+<div id="login_content">
+    <h1 class="title_form no_select">REGISTRO</h1>
+    <form method="post" class="main_forms" onsubmit="return onSubmitClick(event);">
+        @Html.AntiForgeryToken()
+        <input type="text" class="login-control registrer-control" name="Name" value="Nuria" maxlength="50" placeholder="Nombre" required />
+        <input type="text" class="login-control registrer-control" name="LastName" value="Brasero García" maxlength="50" placeholder="Apellidos" />
+        <input type="text" class="login-control registrer-control" name="Phone" value="999111222" maxlength="20" placeholder="Teléfono" />
+        <input type="email" class="login-control registrer-control" name="Email" value="nuriabr@gmail.com" placeholder="Email" required />
+        <input type="password" id="registrer_password" class="login-control registrer-control pass-item" name="Password" value="MCSD2023" placeholder="Contraseña" required />
+        <i class="far fa-eye togglePassword" onClick="VisibilityPassword(0)"></i>
+        <input type="password" id="registrer_password_repeat" class="login-control registrer-control pass-item" value="MCSD2023" placeholder="Repetir Contraseña" required />
+        <i class="far fa-eye togglePassword" onClick="VisibilityPassword(1)"></i>
+        <button id="registrer_btn" class="form-button-submit">
+            <span>Registrarme</span>
+        </button>
+    </form>
+</div>
+
+@section registrer_script {
+    <script>
+        function onSubmitClick(e) {
+            var password = document.getElementById("registrer_password");
+            var repassword = document.getElementById("registrer_password_repeat");
+            if (password.value !== repassword.value) {
+                e.preventDefault();
+                password.style.borderColor = "red";
+                repassword.style.borderColor = "red";
+                //alert
+            }
+            return true;
+        }
+    
+        function VisibilityPassword(option) {
+            if (option === 0) {
+                var password = document.getElementById("registrer_password");
+                password.type = (password.type == "text") ? "password" : "text";
+            } else {
+                var repassword = document.getElementById("registrer_password_repeat");
+                repassword.type = (repassword.type == "text") ? "password" : "text";
+            }
+        };
+    </script>
+}
