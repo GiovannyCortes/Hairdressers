@@ -7,11 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options => {
-        options.IdleTimeout = TimeSpan.FromMinutes(10);
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
     });
 
 string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
+
     builder.Services.AddTransient<IRepositoryUser, RepositoryUsers>();
+    builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
 
     builder.Services.AddDbContext<HairdressersContext> (
         options => options.UseSqlServer(connectionstring)

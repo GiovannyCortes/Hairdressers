@@ -1,6 +1,5 @@
 ﻿using Hairdressers.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Plugins;
 
 namespace Hairdressers.Controllers {
     public class EmailController : Controller {
@@ -26,7 +25,7 @@ namespace Hairdressers.Controllers {
 
         [HttpPost]
         public IActionResult SendConfirmationEmailAsync(string receiver, string email) {
-            EmailService emailService = new EmailService(this._configuration);
+            HelperEmailService emailService = new HelperEmailService(this._configuration);
             int codigo = emailService.SendConfirmationEmail(receiver, email);
 
             //int codigo = 12345;

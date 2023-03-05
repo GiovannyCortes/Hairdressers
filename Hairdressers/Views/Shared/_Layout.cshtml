@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="~/css/footer.css"/>
     <link rel="stylesheet" href="~/css/landing.css"/>
     <link rel="stylesheet" href="~/css/login.css"/>
+    <link rel="stylesheet" href="~/css/user.css"/>
     <link rel="icon" type="image/x-icon" href="~/images/logo/Barber_logo_small_white.ico">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <script src="~/js/jquery-3.6.3.min.js"></script>
 </head>
 <body>
@@ -38,15 +39,10 @@
                             <img src="~/images/user.png" style="height: 100%;"/>
                         </button>
                         <ul id="navbar_float">
-                            @if (Context.Session.GetString("VALIDATION") != null) {
+                            @if (Context.Session.GetObject<User>("USER") != null) {
                                 <li>
-                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items" id="navbar_float_first">
+                                    <a asp-controller="User" asp-action="ControlPanel" class="navbar_float_items" id="navbar_float_first">
                                         Panel de control
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items">
-                                        Citas
                                     </a>
                                 </li>
                                 <li>
@@ -115,9 +111,9 @@
             <p>&copy; 2023 Cut&Go. Todos los derechos reservados.</p>
         </div>
     </footer>
-    @if (IsSectionDefined("registrer_script")) {
-        @RenderSection("registrer_script", false)
-    }
+    @if (IsSectionDefined("registrer_script")) { @RenderSection("registrer_script", false) }    
+    @if (IsSectionDefined("login_script")) { @RenderSection("login_script", false) }
+    @if (IsSectionDefined("control_panel_script")) { @RenderSection("control_panel_script", false) }
     <script>
         $(document).ready(function() {
             $("#navbar_float").hide();

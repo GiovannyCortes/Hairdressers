@@ -1,7 +1,10 @@
-﻿namespace Hairdressers.Interfaces {
+﻿using Hairdressers.Models;
+
+namespace Hairdressers.Interfaces {
     public interface IRepositoryUser {
 
-        string ValidateUser(string email, string password);
-
+        User? ValidateUser(string email, string password);
+        bool IsAdmin(int user_id);
+        Task<User> InsertUserAsync(string password, string name, string lastname, string phone, string email, bool econfirmed);
     }
 }

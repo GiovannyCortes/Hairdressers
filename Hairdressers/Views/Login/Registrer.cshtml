@@ -7,10 +7,10 @@
         <input type="text" class="login-control registrer-control" name="LastName" value="Brasero García" maxlength="50" placeholder="Apellidos" />
         <input type="text" class="login-control registrer-control" name="Phone" value="999111222" maxlength="20" placeholder="Teléfono" />
         <input type="email" class="login-control registrer-control" name="Email" value="nuriabr@gmail.com" placeholder="Email" required />
-        <input type="password" id="registrer_password" class="login-control registrer-control pass-item" name="Password" value="MCSD2023" placeholder="Contraseña" required />
-        <i class="far fa-eye togglePassword" onClick="VisibilityPassword(0)"></i>
-        <input type="password" id="registrer_password_repeat" class="login-control registrer-control pass-item" value="MCSD2023" placeholder="Repetir Contraseña" required />
-        <i class="far fa-eye togglePassword" onClick="VisibilityPassword(1)"></i>
+        <input type="password" oninput="preValidate()" id="registrer_password" class="login-control registrer-control pass-item" name="Password" value="MCSD2023" placeholder="Contraseña" required />
+        <i id="registrer_password_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(0)"></i>
+        <input type="password" oninput="preValidate()" id="registrer_password_repeat" class="login-control registrer-control pass-item" value="MCSD2023" placeholder="Repetir Contraseña" required />
+        <i id="registrer_password_repeat_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(1)"></i>
         <button id="registrer_btn" class="form-button-submit">
             <span>Registrarme</span>
         </button>
@@ -18,26 +18,48 @@
 </div>
 
 @section registrer_script {
+    <style>
+        .redborder { border-color: red; }
+        .orangeborder { border-color: orange; }
+    </style>
     <script>
         function onSubmitClick(e) {
-            var password = document.getElementById("registrer_password");
-            var repassword = document.getElementById("registrer_password_repeat");
-            if (password.value !== repassword.value) {
+            var password = $("#registrer_password");
+            var repassword = $("#registrer_password_repeat");
+            if (password.val() !== repassword.val()) {
                 e.preventDefault();
-                password.style.borderColor = "red";
-                repassword.style.borderColor = "red";
-                //alert
+                password.addClass("redborder");
+                repassword.addClass("redborder");
+                // alert
+            } else {
+                password.removeClass("redborder");
+                repassword.removeClass("redborder");
             }
             return true;
         }
-    
+
+        function preValidate() {
+            var password = $("#registrer_password");
+            var repassword = $("#registrer_password_repeat");
+            if (password.val() !== repassword.val()) {
+                password.addClass("orangeborder");
+                repassword.addClass("orangeborder");
+            } else {
+                password.removeClass("orangeborder");
+                repassword.removeClass("orangeborder");
+            }
+            return true;
+        }
+
         function VisibilityPassword(option) {
             if (option === 0) {
-                var password = document.getElementById("registrer_password");
-                password.type = (password.type == "text") ? "password" : "text";
+                var password = $("#registrer_password");
+                password.attr("type", (password.attr("type") == "text") ? "password" : "text");
+                $("#registrer_password_i").toggleClass("fa-eye-slash fa-eye");
             } else {
-                var repassword = document.getElementById("registrer_password_repeat");
-                repassword.type = (repassword.type == "text") ? "password" : "text";
+                var repassword = $("#registrer_password_repeat");
+                repassword.attr("type", (repassword.attr("type") == "text") ? "password" : "text");
+                $("#registrer_password_repeat_i").toggleClass("fa-eye-slash fa-eye");
             }
         };
     </script>

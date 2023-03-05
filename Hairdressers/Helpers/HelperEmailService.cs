@@ -3,7 +3,7 @@ using MimeKit.Utils;
 using System.IO;
 
 namespace Hairdressers.Helpers {
-    public class EmailService {
+    public class HelperEmailService {
 
         private int _port { get; set; }
         private string _host { get; set; }
@@ -11,7 +11,7 @@ namespace Hairdressers.Helpers {
         private string _sender { get; set; }
         private string _password { get; set; }
 
-        public EmailService(IConfiguration configuration) {
+        public HelperEmailService(IConfiguration configuration) {
             this._host = configuration["EmailSettings:Host"];
             this._port = Convert.ToInt32(configuration["EmailSettings:Port"]);
             this._email = configuration["EmailSettings:Transmitter"];

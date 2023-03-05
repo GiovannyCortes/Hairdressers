@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Hairdressers.Controllers {
     public class RedirectController : Controller {
@@ -7,6 +6,10 @@ namespace Hairdressers.Controllers {
         public IActionResult LogOut() {
             HttpContext.Session.Clear();
             return RedirectToAction("Index", "Landing");
+        }
+
+        public IActionResult Error() {
+            return View();
         }
 
     }

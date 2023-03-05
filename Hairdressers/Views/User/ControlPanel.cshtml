@@ -1,0 +1,46 @@
+﻿@model User
+
+@{
+    List<Hairdresser> peluquerias = ViewData["HAIRDRESSERS"] as List<Hairdresser>;
+}
+
+<div id="background"></div>
+<div>
+    <h1 class="title_form no_select">@Model.Name @Model.LastName</h1>
+    <div class="container_box">
+        <div class="cb_section_1">
+            <div></div>
+            <p>@Model.Email
+                @if (Model.EmailConfirmed) {
+                    <abbr title="Email verificado" style="cursor: pointer;">
+                        <i class="fa fa-check" style="color: green;"></i>
+                    </abbr>
+                } else {
+                    <abbr title="Email no verificado" style="cursor: pointer;">
+                        <i class="fa fa-xmark" style="color: orange;"></i>
+                    </abbr>
+                }
+            </p>
+            <p>@Model.Phone</p>
+            <a asp-controller="UserController" asp-action="UpdateUser">
+                Editar
+            </a>
+            <div></div>
+        </div>
+        @if (peluquerias != null) {
+            <div class="cb_section_2">
+                <ol>
+                    @foreach (Hairdresser h in peluquerias) {
+                        <li>@h.Name</li>
+                    }
+                </ol>
+            </div>
+        }
+    </div>
+</div>
+
+@section control_panel_script {
+    <script>
+
+    </script>
+}

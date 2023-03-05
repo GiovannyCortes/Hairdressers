@@ -1,4 +1,5 @@
-﻿using Hairdressers.Interfaces;
+﻿using Hairdressers.Extensions;
+using Hairdressers.Interfaces;
 using Hairdressers.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,9 +19,9 @@ namespace Hairdressers.Controllers {
 
         [ValidateAntiForgeryToken] [HttpPost]
         public IActionResult Login(string email, string password) {
-            string validation = this.repo_user.ValidateUser(email, password);
-            if (validation != "") {
-                HttpContext.Session.SetString("VALIDATION", validation);
+            User? user = this.repo_user.ValidateUser(email, password);
+            if (user != null) {
+                HttpContext.Session.SetObject("USER", user);
                 return RedirectToAction("Index", "Landing");
             } else {
                 ViewData["VERIFICATION"] = "1"; // 0 - NO LOGIN 1 - ERROR LOGIN
@@ -33,8 +34,10 @@ namespace Hairdressers.Controllers {
         }
 
         [ValidateAntiForgeryToken] [HttpPost]
-        public IActionResult Registrer(User user) {
-            return View();
+        public async Task<IActionResult> Registrer(User user) {
+            User newuser = await this.repo_user.InsertUserAsync(user.Password, user.Name, user.LastName, user.Phone, user.Email, user.EmailConfirmed);
+            HttpContext.Session.SetObject("USER", user);
+            return RedirectToAction("Index", "Landing");
         }
 
         public IActionResult AccesoDenegado() {

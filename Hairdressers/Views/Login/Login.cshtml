@@ -2,14 +2,15 @@
     string? login_status = ViewData["VERIFICATION"] as string;
 }
 <div id="background"></div>
-<div id="login_content">
+<div @*id="login_content"*@>
     <h1 class="title_form no_select">INICIO DE SESIÓN</h1>
     <form method="post" class="main_forms">
         @Html.AntiForgeryToken()
-        <label class="login-label" for="email-control-login">Email</label>
+        <label class="login-label" for="email-control-login">Email</label><br />
         <input type="email" id="email-control-login" class="login-control" name="email" value="giovannycortes@gmail.com" maxlength="50" required />
-        <label class="login-label" for="password-control-login">Contraseña</label>
-        <input type="password" id="password-control-login" class="login-control" name="password" value="MCSD2023" maxlength="50" required />
+        <br /><label class="login-label" for="password-control-login">Contraseña</label><br />
+        <input type="password" id="password-control-login" class="login-control pass-item" name="password" value="MCSD2023" maxlength="50" required />
+        <i id="password-control-login-i" class="fa fa-eye togglePassword" onClick="VisibilityPassword()"></i>
         @if (login_status != null && login_status == "1") {
             <h3 class="form-error-message">Credenciales incorrectas</h3>
         }
@@ -18,3 +19,13 @@
         </button>
     </form>
 </div>
+
+@section login_script {
+    <script>
+        function VisibilityPassword() {
+            var password = $("#password-control-login");
+            password.attr("type", (password.attr("type") == "text") ? "password" : "text");
+            $("#password-control-login-i").toggleClass("fa-eye-slash fa-eye");
+        };
+    </script>
+}

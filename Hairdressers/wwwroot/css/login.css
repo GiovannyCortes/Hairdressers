@@ -24,17 +24,6 @@
     }
 }
 
-#background {
-    background-color: var(--main-blue);
-    /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
-    width: 100vw;
-    height: 100vh;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
-
 .togglePassword {
     cursor: pointer;
     position: relative;

@@ -1,0 +1,39 @@
+﻿.container_box {
+    background-color: white;
+    border-radius: 25px;
+    margin: auto auto 25px auto;
+    width: clamp(400px, 60vw, 1080px);
+    overflow: hidden;
+    text-align: center;
+}
+
+.cb_section_1 {
+    display: grid;
+    grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
+    grid-gap: 5px;
+}
+
+.cb_section_1 > p {
+    padding: 10px;
+    margin-block: 10px;
+}
+
+.cb_section_1 > p > i {
+    margin-left: 10px;
+}
+
+.cb_section_1 > a {
+    margin: auto;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    text-decoration: none;
+    color: rgb(57, 43, 0);
+    background-color: white;
+    border: 1px solid rgb(255, 191, 0);
+    transition: 150ms ease-in;
+}
+
+.cb_section_1 > a:hover {
+    background-color: rgb(255, 191, 0);
+}
