@@ -1,7 +1,8 @@
 ﻿.container_box {
     background-color: white;
     border-radius: 25px;
-    margin: auto auto 25px auto;
+    margin: auto;
+    padding: 10px;
     width: clamp(400px, 60vw, 1080px);
     overflow: hidden;
     text-align: center;
@@ -36,4 +37,39 @@
 
 .cb_section_1 > a:hover {
     background-color: rgb(255, 191, 0);
+}
+
+.column {
+    float: left;
+    width: 25%;
+    padding: 0 10px;
+    margin: 10px;
+}
+
+.cb_section_2 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.cb_section_2:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+        display: block;
+        margin-bottom: 20px;
+    }
+}
+
+/* Style the counter cards */
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    text-align: center;
+    background-color: #f1f1f1;
 }

@@ -19,6 +19,9 @@ body {
     scrollbar-width: none; /* for Firefox */
     overflow-y: scroll;
     margin-top: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 body::-webkit-scrollbar {
@@ -46,6 +49,10 @@ body::-webkit-scrollbar {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+.mauto {
+    margin: auto;
 }
 
 #bkg_video {

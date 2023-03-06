@@ -5,7 +5,7 @@
 }
 
 <div id="background"></div>
-<div>
+<div class="mauto">
     <h1 class="title_form no_select">@Model.Name @Model.LastName</h1>
     <div class="container_box">
         <div class="cb_section_1">
@@ -29,11 +29,15 @@
         </div>
         @if (peluquerias != null) {
             <div class="cb_section_2">
-                <ol>
-                    @foreach (Hairdresser h in peluquerias) {
-                        <li>@h.Name</li>
-                    }
-                </ol>
+                @foreach (Hairdresser h in peluquerias) {
+                    <div class="column">
+                        <div class="card">
+                            <h3>Card 1</h3>
+                            <p>Some text</p>
+                            <p>Some text</p>
+                        </div>
+                    </div>
+                }
             </div>
         }
     </div>

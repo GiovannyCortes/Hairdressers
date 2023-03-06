@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.IdleTimeout = TimeSpan.FromMinutes(30);
     });
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
 
     builder.Services.AddTransient<IRepositoryUser, RepositoryUsers>();
     builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
