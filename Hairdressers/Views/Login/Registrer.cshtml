@@ -23,14 +23,16 @@
         .orangeborder { border-color: orange; }
     </style>
     <script>
+        var password = $("#registrer_password");
+        var repassword = $("#registrer_password_repeat");
+
         function onSubmitClick(e) {
-            var password = $("#registrer_password");
-            var repassword = $("#registrer_password_repeat");
             if (password.val() !== repassword.val()) {
                 e.preventDefault();
                 password.addClass("redborder");
+                password.removeClass("orangeborder");
                 repassword.addClass("redborder");
-                // alert
+                repassword.removeClass("orangeborder");
             } else {
                 password.removeClass("redborder");
                 repassword.removeClass("redborder");
@@ -39,8 +41,6 @@
         }
 
         function preValidate() {
-            var password = $("#registrer_password");
-            var repassword = $("#registrer_password_repeat");
             if (password.val() !== repassword.val()) {
                 password.addClass("orangeborder");
                 repassword.addClass("orangeborder");

@@ -13,7 +13,6 @@ namespace Hairdressers.Controllers {
         }
 
         public IActionResult Login() {
-            ViewData["VERIFICATION"] = "0";  // 0 - NO LOGIN 1 - ERROR LOGIN
             return View();
         }
 
@@ -24,7 +23,7 @@ namespace Hairdressers.Controllers {
                 HttpContext.Session.SetObject("USER", user);
                 return RedirectToAction("Index", "Landing");
             } else {
-                ViewData["VERIFICATION"] = "1"; // 0 - NO LOGIN 1 - ERROR LOGIN
+                ViewData["VERIFICATION"] = "Credenciales incorrectas";
                 return View();
             }
         }
@@ -36,7 +35,7 @@ namespace Hairdressers.Controllers {
         [ValidateAntiForgeryToken] [HttpPost]
         public async Task<IActionResult> Registrer(User user) {
             User newuser = await this.repo_user.InsertUserAsync(user.Password, user.Name, user.LastName, user.Phone, user.Email, user.EmailConfirmed);
-            HttpContext.Session.SetObject("USER", user);
+            HttpContext.Session.SetObject("USER", newuser);
             return RedirectToAction("Index", "Landing");
         }
 

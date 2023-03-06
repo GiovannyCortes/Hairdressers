@@ -11,8 +11,8 @@
         <br /><label class="login-label" for="password-control-login">Contraseña</label><br />
         <input type="password" id="password-control-login" class="login-control pass-item" name="password" value="MCSD2023" maxlength="50" required />
         <i id="password-control-login-i" class="fa fa-eye togglePassword" onClick="VisibilityPassword()"></i>
-        @if (login_status != null && login_status == "1") {
-            <h3 class="form-error-message">Credenciales incorrectas</h3>
+        @if (login_status != null) {
+            <h3 class="form-error-message">@login_status</h3>
         }
         <button class="form-button-submit">
             <span>Iniciar sesión</span>
