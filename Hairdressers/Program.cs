@@ -10,10 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
         options.IdleTimeout = TimeSpan.FromMinutes(30);
     });
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
 
     builder.Services.AddTransient<IRepositoryUser, RepositoryUsers>();
     builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
+    builder.Services.AddTransient<IRepositorySchedule, RepositorySchedule>();
 
     builder.Services.AddDbContext<HairdressersContext> (
         options => options.UseSqlServer(connectionstring)

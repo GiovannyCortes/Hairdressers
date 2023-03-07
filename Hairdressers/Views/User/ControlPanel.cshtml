@@ -22,7 +22,7 @@
                 }
             </p>
             <p>@Model.Phone</p>
-            <a asp-controller="UserController" asp-action="UpdateUser">
+            <a asp-controller="User" asp-action="UpdateUser">
                 Editar
             </a>
             <div></div>
@@ -40,13 +40,3 @@
         }
     </div>
 </div>
-
-@section control_panel_script {
-    <script>
-        //function redirectView(value) {
-        //    @ViewData["HAIRDRESSER_SELECTED"] = value;
-        //    alert(@ViewData["HAIRDRESSER_SELECTED"]);
-        //    //window.location.href = "/";
-        //}
-    </script>
-}

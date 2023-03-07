@@ -12,11 +12,12 @@
     display: grid;
     grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
     grid-gap: 5px;
+    margin-top: 5px;
 }
 
 .cb_section_1 > p {
     padding: 10px;
-    margin-block: 10px;
+    margin-block: auto;
 }
 
 .cb_section_1 > p > i {
@@ -40,6 +41,7 @@
 }
 
 .cb_section_2 {
+    margin-top: 15px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;

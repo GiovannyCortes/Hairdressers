@@ -1,3 +1,26 @@
-﻿<h1>
-    @ViewData["PRUEBA"];
-</h1>
+﻿@model Hairdresser
+
+<div id="background"></div>
+<div class="mauto">
+    <h1 class="title_form no_select">@Model.Name</h1>
+    <div class="container_box">
+        <div class="cb_section_1">
+            <div></div>
+            <p>@Model.Address</p>
+            <p>@Model.Phone</p>
+            <a asp-controller="Hairdresser" asp-action="Update">Editar</a>
+            <div></div>
+        </div>
+@*        @if (peluquerias != null) { NECESITAMOS LISTADO DE SCHEDULES
+            <div class="cb_section_2" >
+                @foreach (Hairdresser h in peluquerias) {
+                    <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@h.HairdresserId" class="card no_select">
+                        <h3>@h.Name</h3>
+                        <p>@h.Address</p>
+                        <p>@h.Phone</p>
+                    </a>
+                }
+            </div>
+        }*@
+    </div>
+</div>

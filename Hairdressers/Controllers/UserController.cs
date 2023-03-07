@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hairdressers.Controllers {
     public class UserController : Controller {
 
-        IRepositoryUser repo_user;
-        IRepositoryHairdresser repo_hairdresser;
+        private IRepositoryUser repo_user;
+        private IRepositoryHairdresser repo_hairdresser;
 
         public UserController(IRepositoryHairdresser repo_hairdresser, IRepositoryUser repo_user) {
             this.repo_user = repo_user;
@@ -18,6 +18,8 @@ namespace Hairdressers.Controllers {
         public IActionResult ControlPanel() {
             User user = HttpContext.Session.GetObject<User>("USER");
             if (user == null) {
+                ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";
+                ViewData["ERROR_MESSAGE_SUBTITLE"] = "Usuario no encontrado";
                 return RedirectToAction("Error", "Redirect");
             } else {
                 if (this.repo_user.IsAdmin(user.UserId)) {
@@ -26,6 +28,10 @@ namespace Hairdressers.Controllers {
                 }
                 return View(user);
             }
+        }
+
+        public IActionResult ClientAppointments() { // Gestión de citas (Solicitudes)
+            return View();
         }
 
     }

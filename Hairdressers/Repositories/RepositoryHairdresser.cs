@@ -12,6 +12,19 @@ namespace Hairdressers.Repositories {
             this.context = context;
         }
 
+        public Hairdresser? FindHairdresser(int hairdresser_id) {
+            var consulta = from data in context.Hairdressers
+                           where data.HairdresserId == hairdresser_id
+                           select new Hairdresser {
+                               HairdresserId = data.HairdresserId,
+                               Name = data.Name,
+                               Address = data.Address,
+                               PostalCode = data.PostalCode,
+                               Phone = data.Phone ?? "Sin número de teléfono"
+                           };
+            return consulta.ToList().FirstOrDefault();
+        }
+
         public List<Hairdresser> GetHairdressers(int user_id) {
             var consulta = context.Hairdressers
                            .Join(
