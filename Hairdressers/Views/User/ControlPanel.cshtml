@@ -28,15 +28,13 @@
             <div></div>
         </div>
         @if (peluquerias != null) {
-            <div class="cb_section_2">
+            <div class="cb_section_2" >
                 @foreach (Hairdresser h in peluquerias) {
-                    <div class="column">
-                        <div class="card">
-                            <h3>Card 1</h3>
-                            <p>Some text</p>
-                            <p>Some text</p>
-                        </div>
-                    </div>
+                    <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@h.HairdresserId" class="card no_select">
+                        <h3>@h.Name</h3>
+                        <p>@h.Address</p>
+                        <p>@h.Phone</p>
+                    </a>
                 }
             </div>
         }
@@ -45,6 +43,10 @@
 
 @section control_panel_script {
     <script>
-
+        //function redirectView(value) {
+        //    @ViewData["HAIRDRESSER_SELECTED"] = value;
+        //    alert(@ViewData["HAIRDRESSER_SELECTED"]);
+        //    //window.location.href = "/";
+        //}
     </script>
 }

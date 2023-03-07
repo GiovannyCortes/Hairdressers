@@ -52,7 +52,7 @@ body::-webkit-scrollbar {
 }
 
 .mauto {
-    margin: auto;
+    margin: auto auto 50px auto;
 }
 
 #bkg_video {

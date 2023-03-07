@@ -39,13 +39,6 @@
     background-color: rgb(255, 191, 0);
 }
 
-.column {
-    float: left;
-    width: 25%;
-    padding: 0 10px;
-    margin: 10px;
-}
-
 .cb_section_2 {
     display: flex;
     flex-wrap: wrap;
@@ -54,22 +47,22 @@
 
 .cb_section_2:after {
     content: "";
-    display: table;
     clear: both;
 }
 
-@media screen and (max-width: 600px) {
-    .column {
-        width: 100%;
-        display: block;
-        margin-bottom: 20px;
-    }
-}
-
-/* Style the counter cards */
 .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    width: 90%;
+    margin-bottom: 20px;
     padding: 16px;
+    border-radius: 25px;
     text-align: center;
     background-color: #f1f1f1;
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+
+.card:hover {
+    background-color: orange;
 }
