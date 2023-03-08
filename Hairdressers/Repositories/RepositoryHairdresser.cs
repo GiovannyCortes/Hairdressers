@@ -13,7 +13,7 @@ namespace Hairdressers.Repositories {
         }
 
         public Hairdresser? FindHairdresser(int hairdresser_id) {
-            var consulta = from data in context.Hairdressers
+            var consulta = from data in this.context.Hairdressers
                            where data.HairdresserId == hairdresser_id
                            select new Hairdresser {
                                HairdresserId = data.HairdresserId,
@@ -23,6 +23,18 @@ namespace Hairdressers.Repositories {
                                Phone = data.Phone ?? "Sin número de teléfono"
                            };
             return consulta.ToList().FirstOrDefault();
+        }
+
+        public List<Hairdresser> GetHairdressers() {
+            var consulta = from data in this.context.Hairdressers
+                           select new Hairdresser {
+                               HairdresserId = data.HairdresserId,
+                               Name = data.Name,
+                               Address = data.Address,
+                               PostalCode = data.PostalCode,
+                               Phone = data.Phone ?? "Sin número de teléfono"
+                           };
+            return consulta.ToList();
         }
 
         public List<Hairdresser> GetHairdressers(int user_id) {
@@ -48,6 +60,18 @@ namespace Hairdressers.Repositories {
                                         Phone = x.Hairdresser.Phone ?? "Sin número de teléfono"
                                   });
             return consulta.ToList();
+        }
+
+        public Task InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id) {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateHairdresserAsync(int hairdresser_id, string name, string phone, string address, int postal_code, int user_id) {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteHairdresserAsync(int hairdresser_id) {
+            throw new NotImplementedException();
         }
 
     }

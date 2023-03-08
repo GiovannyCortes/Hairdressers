@@ -15,6 +15,7 @@ string connectionstring = builder.Configuration.GetConnectionString("SqlHairdres
     builder.Services.AddTransient<IRepositoryUser, RepositoryUsers>();
     builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
     builder.Services.AddTransient<IRepositorySchedule, RepositorySchedule>();
+    builder.Services.AddTransient<IRepositoryScheduleRow, RepositoryScheduleRow>();
 
     builder.Services.AddDbContext<HairdressersContext> (
         options => options.UseSqlServer(connectionstring)
@@ -31,7 +32,7 @@ var app = builder.Build();
     app.UseSession();
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Landing}/{action=Index}"
+        pattern: "{controller=Redirect}/{action=Prueba}"
     );
 
 app.Run();

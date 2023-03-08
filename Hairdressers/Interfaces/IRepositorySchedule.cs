@@ -5,8 +5,8 @@ namespace Hairdressers.Interfaces {
 
         List<string> GetNameSchedules(int hairdresser_id);
         List<Schedule> GetSchedules(int hairdresser_id);
-        Schedule FindSchedule(int schedule_id);
-        Task InsertScheduleAsync(int hairdresser_id, string name, bool active);
+        Schedule? FindSchedule(int schedule_id);
+        Task<int> InsertScheduleAsync(int hairdresser_id, string name, bool active);
         Task UpdateScheduleAsync(int schedule_id, int hairdresser_id, string name, bool active);
         Task DeleteScheduleAsync(int schedule_id);
 

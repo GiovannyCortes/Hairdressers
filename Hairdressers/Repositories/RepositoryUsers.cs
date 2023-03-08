@@ -30,7 +30,7 @@ namespace Hairdressers.Repositories {
         public async Task<User> InsertUserAsync
             (string password, string name, string lastname, string phone, string email, bool econfirmed) {
 
-            var newid = context.Users.Any() ? context.Users.Max(u => u.UserId) + 1 : 1;
+            var newid = this.context.Users.Any() ? this.context.Users.Max(u => u.UserId) + 1 : 1;
 
             User user = new User {
                 UserId = newid,
@@ -48,7 +48,7 @@ namespace Hairdressers.Repositories {
         }
 
         public bool IsAdmin(int user_id) {
-            return context.Admins.Any(a => a.UserId == user_id);
+            return this.context.Admins.Any(a => a.UserId == user_id);
         }
     }
 }

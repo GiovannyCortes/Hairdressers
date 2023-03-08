@@ -7,9 +7,11 @@ namespace Hairdressers.Controllers {
     public class RedirectController : Controller {
 
         private IRepositoryUser repo_user;
+        private IRepositorySchedule repo_schedules;
 
-        public RedirectController(IRepositoryUser repo_user) {
+        public RedirectController(IRepositoryUser repo_user, IRepositorySchedule repo_schedules) {
             this.repo_user = repo_user;
+            this.repo_schedules = repo_schedules;
         }
 
         public IActionResult LogOut() {
@@ -34,6 +36,10 @@ namespace Hairdressers.Controllers {
                     return RedirectToAction("ClientAppointments", "User"); 
                 }
             }
+        }
+
+        public async Task<IActionResult> Prueba() {
+            return View();
         }
 
     }
