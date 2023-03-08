@@ -48,7 +48,7 @@ namespace Hairdressers.Repositories {
         }
 
         public bool IsAdmin(int user_id) {
-            return context.Admins.Any(a => a.UserId == user_id); ;
+            return context.Admins.Any(a => a.UserId == user_id);
         }
     }
 }
