@@ -62,16 +62,38 @@ namespace Hairdressers.Repositories {
             return consulta.ToList();
         }
 
-        public Task InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id) {
-            throw new NotImplementedException();
+        public async Task<int> InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id) {
+            var newid = this.context.Hairdressers.Any() ? this.context.Hairdressers.Max(s => s.HairdresserId) + 1 : 1;
+            Hairdresser hairdresser = new Hairdresser {
+                HairdresserId = newid,
+                Name = name,
+                Phone = phone,
+                Address = address,
+                PostalCode = postal_code
+            };
+            this.context.Hairdressers.Add(hairdresser);
+            // falta meter admin
+            await this.context.SaveChangesAsync();
+            return newid;
         }
 
-        public Task UpdateHairdresserAsync(int hairdresser_id, string name, string phone, string address, int postal_code, int user_id) {
-            throw new NotImplementedException();
+        public async Task UpdateHairdresserAsync(int hairdresser_id, string name, string phone, string address, int postal_code) {
+            Hairdresser? hairdresser = this.FindHairdresser(hairdresser_id);
+            if (hairdresser != null) {
+                hairdresser.Name = name;
+                hairdresser.Phone = phone;
+                hairdresser.Address = address;
+                hairdresser.PostalCode = postal_code;
+                await this.context.SaveChangesAsync();
+            }
         }
 
-        public Task DeleteHairdresserAsync(int hairdresser_id) {
-            throw new NotImplementedException();
+        public async Task DeleteHairdresserAsync(int hairdresser_id) {
+            Hairdresser? hairdresser = this.FindHairdresser(hairdresser_id);
+            if (hairdresser != null) {
+                this.context.Hairdressers.Remove(hairdresser);
+                await this.context.SaveChangesAsync();
+            }
         }
 
     }
