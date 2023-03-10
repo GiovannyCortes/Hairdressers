@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hairdressers.Controllers {
     public class UserController : Controller {
 
-        private IRepositoryUser repo_user;
         private IRepositoryHairdresser repo_hairdresser;
 
-        public UserController(IRepositoryHairdresser repo_hairdresser, IRepositoryUser repo_user) {
-            this.repo_user = repo_user;
+        public UserController(IRepositoryHairdresser repo_hairdresser) {
             this.repo_hairdresser = repo_hairdresser;
         }
 
@@ -22,7 +20,7 @@ namespace Hairdressers.Controllers {
                 ViewData["ERROR_MESSAGE_SUBTITLE"] = "Usuario no encontrado";
                 return RedirectToAction("Error", "Redirect");
             } else {
-                if (this.repo_user.IsAdmin(user.UserId)) {
+                if (this.repo_hairdresser.IsAdmin(user.UserId)) {
                     List<Hairdresser> hairdressers = this.repo_hairdresser.GetHairdressers(user.UserId);
                     ViewData["HAIRDRESSERS"] = hairdressers;
                 }

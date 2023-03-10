@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Hairdressers.Controllers {
     public class RedirectController : Controller {
 
-        private IRepositoryUser repo_user;
         private IRepositoryHairdresser repo_hairdresser;
 
-        public RedirectController(IRepositoryUser repo_user, IRepositoryHairdresser repo_hairdresser) {
-            this.repo_user = repo_user;
+        public RedirectController(IRepositoryHairdresser repo_hairdresser) {
             this.repo_hairdresser = repo_hairdresser;
         }
 
@@ -30,7 +28,7 @@ namespace Hairdressers.Controllers {
                 ViewData["ERROR_MESSAGE_SUBTITLE"] = "Usuario no encontrado";
                 return RedirectToAction("Error", "Redirect");
             } else { // Usuario en la Session
-                if (this.repo_user.IsAdmin(user.UserId)) { // Es administrador, necesitamos que elija opción
+                if (this.repo_hairdresser.IsAdmin(user.UserId)) { // Es administrador, necesitamos que elija opción
                     return RedirectToAction("", "");
                 } else { // Solo puede pedir citas
                     return RedirectToAction("ClientAppointments", "User"); 
