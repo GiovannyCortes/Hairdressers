@@ -10,7 +10,7 @@
 
 .cb_section_1 {
     display: grid;
-    grid-template-columns: 0.5fr 2fr 1fr 1fr 0.5fr;
+    grid-template-columns: 0.2fr 2fr 1fr 1fr 0.2fr;
     grid-gap: 5px;
     margin-top: 5px;
 }
@@ -59,12 +59,38 @@
     padding: 16px;
     border-radius: 25px;
     text-align: center;
-    background-color: #f1f1f1;
     cursor: pointer;
     text-decoration: none;
     color: black;
+    transition: 150ms ease-in-out;
 }
 
-.card:hover {
+.card_view {
+    background-color: #f1f1f1;
+}
+
+.card_view:hover {
     background-color: orange;
+}
+
+.card_create {
+    font-weight: 700;
+    background-color: dodgerblue;
+}
+
+.card_create:hover {
+    color: white;
+    background-color: var(--main-red);
+}
+
+.icon_h1 {
+    font-size: 0.5em;
+    margin-block: auto;
+    vertical-align: middle;
+    transform: translateY(-3px);
+    cursor: pointer;
+}
+
+.icon_h1:hover {
+    color: orange;
 }

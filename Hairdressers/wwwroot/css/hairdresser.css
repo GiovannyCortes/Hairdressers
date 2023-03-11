@@ -1,0 +1,30 @@
+﻿.autocomplete_box {
+    color: white;
+    background-color: rgb(79, 113, 138);
+    margin-bottom: 20px;
+}
+
+.autocomplete_box::placeholder {
+    color: white;
+    opacity: 1;
+}
+
+.autocomplete_box:-ms-input-placeholder {
+    color: white;
+}
+
+.form_div_flex {
+    display: flex;
+    width: 96%;
+    margin: auto;
+}
+
+.form_div_flex > input:first-child {
+    width: 520%;
+    margin-right: 10px;
+}
+
+#h_phone {
+    width: 30%;
+    margin-left: 2%;
+}

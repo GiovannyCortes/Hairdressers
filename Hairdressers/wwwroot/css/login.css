@@ -46,7 +46,6 @@
 .main_forms {
     background-color: white;
     border-radius: 25px;
-    margin: auto auto 25px auto;
     width: clamp(400px, 60vw, 1080px);
     /*height: clamp(200px, 60vh, 600px);*/
     overflow: hidden;
@@ -69,22 +68,15 @@
     font-size: 0.9em;
 }
 
-.registrer-control:first-child {
-    margin-block: 28px 15px;
-}
-
 .registrer-control {
-    margin-block: 15px;
+    margin-block: 10px;
 }
 
-.form-error-message {
-    text-align: center;
-    margin: 10px auto;
-    color: red;
-    animation: shake 1s;
+.registrer-control:first-child {
+    margin-block: 30px 10px;
 }
 
-.form-button-submit {
+.login-form-button-submit {
     display: block;
     width: 150px;
     height: 50px;
@@ -98,8 +90,8 @@
     cursor: pointer;
 }
 
-.form-button-submit::before,
-.form-button-submit::after {
+.login-form-button-submit::before,
+.login-form-button-submit::after {
     content: '';
     position: absolute;
     top: 0;
@@ -111,28 +103,28 @@
     z-index: -1;
 }
 
-.form-button-submit::before {
+.login-form-button-submit::before {
     left: -10px;
     background: rgb(65,80,115);
 }
 
-.form-button-submit::after {
+.login-form-button-submit::after {
     right: -10px;
     background: rgb(156,72,81);
 }
 
-.form-button-submit:hover::before,
-.form-button-submit:hover::after {
+.login-form-button-submit:hover::before,
+.login-form-button-submit:hover::after {
     width: 58%;
 }
 
-.form-button-submit span {
+.login-form-button-submit span {
     color: var(--main-gray);
     font-size: 18px;
     transition: all 0.3s ease-in;
 }
 
-.form-button-submit:hover span {
+.login-form-button-submit:hover span {
     color: white;
     transition: 0.3s;
 }

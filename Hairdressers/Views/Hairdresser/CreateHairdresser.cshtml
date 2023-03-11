@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "C&G: Nueva Peluquería";
+}
+
+<div id="background"></div>
+<div class="mauto">
+    <h1 class="title_form no_select data">Nueva Peluquería</h1>
+    <div class="container_box">
+        <input type="text" id="autocomplete" class="form-control autocomplete_box" placeholder="Buscador de peluquerías..."/>
+        <form method="post" action="CreateHairdresser" class="data" style="margin-top: 10px;">
+            @Html.AntiForgeryToken()
+            <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" />
+            <div class="form_div_flex">
+                <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" />
+                <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" />
+            </div>
+            <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" />
+            <button class="form-button-submit">
+                Guardar cambios
+            </button>
+        </form>
+    </div>
+</div>
+
+@section createhairdresser_script {
+    <script>
+        function getGoogleMapsIframe(address) {
+            const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(address)}&key=AIzaSyAg4OpucveKYKlYtgmtG5RmCiKJSRCfK9I`;
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('src', mapUrl);
+            iframe.setAttribute('width', '600');
+            iframe.setAttribute('height', '450');
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('style', 'border:0');
+            document.getElementById("mapas").appendChild(iframe);
+        }
+
+        function initAutocomplete() {
+            const input = document.getElementById('autocomplete');
+            const autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.addListener('place_changed', function () {
+                const place = autocomplete.getPlace();
+                //console.log(place.types);
+
+                if (place.types.includes("hair_care")) {
+                    var postalCode = place.address_components[place.address_components.length - 1].long_name;
+                    var cp_index = (place.formatted_address).indexOf(postalCode);
+
+                    var address = (cp_index != -1)? (place.formatted_address).substring(0, cp_index) : (place.formatted_address).split(",",1)[0];
+
+                    document.getElementById('h_name').value = place.name;
+                    document.getElementById('h_address').value = address.trim().replace(/(^,)|(,$)/g, "");
+                    document.getElementById('h_postalCode').value = postalCode;
+                    document.getElementById('h_phone').value = place.formatted_phone_number;
+                }
+
+                console.log(place);
+                //getGoogleMapsIframe(place.formatted_address);
+            });
+        }
+    </script>
+}

@@ -1,16 +1,30 @@
 ﻿@model Hairdresser
 
+@{
+    ViewData["Title"] = "C&G: Panel de control";
+}
+
 <div id="background"></div>
 <div class="mauto">
-    <h1 class="title_form no_select">@Model.Name</h1>
+    <h1 class="title_form no_select data">@Model.Name <i class="fa fa-pen-to-square icon_h1"></i></h1>
+    <h1 class="title_form no_select data hide">Editar Peluquería</h1>
     <div class="container_box">
-        <div class="cb_section_1">
-            <div></div>
+        <div class="data">
             <p>@Model.Address</p>
             <p>@Model.Phone</p>
-            <a asp-controller="Hairdresser" asp-action="Update">Editar</a>
-            <div></div>
         </div>
+        <form method="post" action="CreateHairdresser" class="data hide" style="margin-top: 10px;">
+            @Html.AntiForgeryToken()
+            <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" />
+            <div class="form_div_flex">
+                <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" />
+                <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" />
+            </div>
+            <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" />
+            <button class="form-button-submit">
+                Guardar cambios
+            </button>
+        </form>
 @*        @if (peluquerias != null) { NECESITAMOS LISTADO DE SCHEDULES
             <div class="cb_section_2" >
                 @foreach (Hairdresser h in peluquerias) {
@@ -24,3 +38,13 @@
         }*@
     </div>
 </div>
+
+@section hairdresser_script{
+    <script>
+        $(function() {
+            $('.icon_h1').click(function() {
+                $('.data').toggleClass('hide');
+            });
+        });
+    </script>
+}

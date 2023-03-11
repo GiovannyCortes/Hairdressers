@@ -1,17 +1,21 @@
-﻿<div id="background"></div>
+﻿@{
+    ViewData["Title"] = "C&G: Registro";
+}
+
+<div id="background"></div>
 <div class="mauto">
     <h1 class="title_form no_select">REGISTRO</h1>
     <form method="post" class="main_forms" onsubmit="return onSubmitClick(event);">
         @Html.AntiForgeryToken()
-        <input type="text" class="login-control registrer-control" name="Name" value="Nuria" maxlength="50" placeholder="Nombre" required />
-        <input type="text" class="login-control registrer-control" name="LastName" value="Brasero García" maxlength="50" placeholder="Apellidos" />
-        <input type="text" class="login-control registrer-control" name="Phone" value="999111222" maxlength="20" placeholder="Teléfono" />
-        <input type="email" class="login-control registrer-control" name="Email" value="nuriabr@gmail.com" placeholder="Email" required />
-        <input type="password" oninput="preValidate()" id="registrer_password" class="login-control registrer-control pass-item" name="Password" value="MCSD2023" placeholder="Contraseña" required />
+        <input type="text" class="login-control registrer-control" name="Name" maxlength="50" placeholder="Nombre" required />
+        <input type="text" class="login-control registrer-control" name="LastName" maxlength="50" placeholder="Apellidos" />
+        <input type="text" class="login-control registrer-control" name="Phone" maxlength="20" placeholder="Teléfono" />
+        <input type="email" class="login-control registrer-control" name="Email" maxlength="50" placeholder="Email" required />
+        <input type="password" oninput="preValidate()" id="registrer_password" class="login-control registrer-control pass-item" name="Password" placeholder="Contraseña" required />
         <i id="registrer_password_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(0)"></i>
-        <input type="password" oninput="preValidate()" id="registrer_password_repeat" class="login-control registrer-control pass-item" value="MCSD2023" placeholder="Repetir Contraseña" required />
+        <input type="password" oninput="preValidate()" id="registrer_password_repeat" class="login-control registrer-control pass-item" placeholder="Repetir Contraseña" style="margin-block: 10px 0;" required />
         <i id="registrer_password_repeat_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(1)"></i>
-        <button id="registrer_btn" class="form-button-submit">
+        <button id="registrer_btn" class="login-form-button-submit">
             <span>Registrarme</span>
         </button>
     </form>
@@ -41,7 +45,7 @@
         }
 
         function preValidate() {
-            if (password.val() !== repassword.val()) {
+            if ((repassword.val() != "") && (password.val() !== repassword.val())) {
                 password.addClass("orangeborder");
                 repassword.addClass("orangeborder");
             } else {

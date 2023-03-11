@@ -21,7 +21,7 @@ namespace Hairdressers.Controllers {
             User? user = this.repo_hairdresser.ValidateUser(email, password);
             if (user != null) {
                 HttpContext.Session.SetObject("USER", user);
-                return RedirectToAction("Index", "Landing");
+                return RedirectToAction("ControlPanel", "User");
             } else {
                 ViewData["VERIFICATION"] = "Credenciales incorrectas";
                 return View();
@@ -33,10 +33,10 @@ namespace Hairdressers.Controllers {
         }
 
         [ValidateAntiForgeryToken] [HttpPost]
-        public async Task<IActionResult> Registrer(User user) {
-            User newuser = await this.repo_hairdresser.InsertUserAsync(user.Password, user.Name, user.LastName, user.Phone, user.Email, user.EmailConfirmed);
+        public async Task<IActionResult> Registrer(string Password, string Name, string LastName, string Phone, string Email, bool EmailConfirmed) {
+            User newuser = await this.repo_hairdresser.InsertUserAsync(Password, Name, LastName, Phone, Email, EmailConfirmed);
             HttpContext.Session.SetObject("USER", newuser);
-            return RedirectToAction("Index", "Landing");
+            return RedirectToAction("ControlPanel", "User");
         }
 
         public IActionResult AccesoDenegado() {

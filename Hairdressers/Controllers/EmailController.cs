@@ -25,11 +25,11 @@ namespace Hairdressers.Controllers {
 
         [HttpPost]
         public IActionResult SendConfirmationEmailAsync(string receiver, string email) {
-            HelperEmailService emailService = new HelperEmailService(this._configuration);
-            int codigo = emailService.SendConfirmationEmail(receiver, email);
+            //HelperEmailService emailService = new HelperEmailService(this._configuration);
+            //int codigo = emailService.SendConfirmationEmail(receiver, email);
 
             //int codigo = 12345;
-            HttpContext.Session.SetString("CodigoVerificacion", codigo.ToString());
+            //HttpContext.Session.SetString("CodigoVerificacion", codigo.ToString());
             return RedirectToAction("CompareConfirmation");
         }
 

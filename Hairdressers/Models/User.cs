@@ -9,8 +9,14 @@ namespace Hairdressers.Models {
         public int UserId { get; set; }
         
         [Column("password")]
-        public string Password { get; set; }
-        
+        public byte[] Password { get; set; }
+
+        [Column("password_read")]
+        public string PasswordRead { get; set; }
+
+        [Column("salt")]
+        public string Salt { get; set; }
+
         [Column("name")]
         public string Name { get; set; }
         
@@ -25,26 +31,6 @@ namespace Hairdressers.Models {
         
         [Column("email_validated")]
         public bool EmailConfirmed { get; set; }
-
-        public User() {
-            this.UserId = 0;
-            this.Password = "";
-            this.Name = "";
-            this.LastName = "";
-            this.Phone = "";
-            this.Email = "";
-            this.EmailConfirmed = false;
-        }
-
-        public User(int userId, string password, string name, string lastName, string phone, string email, bool emailConfirmed) {
-            this.UserId = userId;
-            this.Password = password;
-            this.Name = name;
-            this.LastName = lastName;
-            this.Phone = phone;
-            this.Email = email;
-            this.EmailConfirmed = emailConfirmed;
-        }
 
     }
 }

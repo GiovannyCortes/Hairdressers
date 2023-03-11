@@ -2,6 +2,7 @@
     width: 100vw;
     position: fixed;
     transform: translateY(-60px);
+    z-index: 20;
 }
 
 @media screen and (orientation: landscape) and (max-width: 850px) {

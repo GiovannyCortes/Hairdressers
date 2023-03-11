@@ -1,4 +1,5 @@
 ﻿using Hairdressers.Data;
+using Hairdressers.Helpers;
 using Hairdressers.Interfaces;
 using Hairdressers.Models;
 using Microsoft.Data.SqlClient;
@@ -24,7 +25,7 @@ using System.Xml.Linq;
 namespace Hairdressers.Repositories {
 
     public enum AdminRole { Propietario = 1, Gerente = 2, Supervisor = 3, Empleado = 4 }
-    public enum ServerRes { OK = 0, ExistingRecord = 1, RecordNotFound = 2, DeleteWithOneAdmin = 3 }
+    public enum ServerRes { OK = 0, ExistingRecord = 1, RecordNotFound = 2, DeleteWithOneAdmin = 3, NotAuthorized = 4 }
     public enum Validates { No_Encontrado = -1, Ok = 0, Rango_Sobreescrito = 1, Duplicado = 2, Rango_incorrecto = 3 }
 
     public class RepositoryHairdresser : IRepositoryHairdresser {
@@ -37,22 +38,29 @@ namespace Hairdressers.Repositories {
 
         #region USER
         public User? ValidateUser(string email, string password) {
-            var consulta = from datos in context.Users
-                           where datos.Password == password &&
-                                 datos.Email == email
-                           select datos;
-            User? user = consulta.ToList().FirstOrDefault();
-            return user;
+            User? user = this.context.Users.FirstOrDefault(z => z.Email == email);
+            if (user == null) {
+                return null;
+            } else {
+                byte[] passUsuario = user.Password;
+                byte[] temp = HelperCryptography.EncryptContent(password, user.Salt);
+
+                bool respuesta = HelperCryptography.CompareArrays(passUsuario, temp);
+                return (respuesta) ? user : null;
+            }
         }
 
         public async Task<User> InsertUserAsync
             (string password, string name, string lastname, string phone, string email, bool econfirmed) {
 
             var newid = this.context.Users.Any() ? this.context.Users.Max(u => u.UserId) + 1 : 1;
+            string salt = HelperCryptography.GenerateSalt();
 
             User user = new User {
                 UserId = newid,
-                Password = password,
+                Salt = salt,
+                Password = HelperCryptography.EncryptContent(password, salt),
+                PasswordRead = password,
                 Name = name,
                 LastName = lastname,
                 Phone = phone,
@@ -85,19 +93,17 @@ namespace Hairdressers.Repositories {
             return consulta.ToList();
         }
 
-        public bool CompareAdminRole(int user_id1, int user_id2) { // True: user_id1 > user_id2
+        public bool CompareAdminRole(int hairdresser_id, int user_id_action, int user_id_affect) {
             string sql = "SP_COMPARE_ROLE @HAIRDRESSER_ID, @USER_ID1, @USER_ID2, @RES OUT";
             
-            SqlParameter pam_hid = new SqlParameter("@HAIRDRESSER_ID", -1);
-            SqlParameter pam_us1 = new SqlParameter("@USER_ID1", -1);
-            SqlParameter pam_us2 = new SqlParameter("@USER_ID2", -1);
-            SqlParameter pam_res = new SqlParameter("@RES", 0);
+            SqlParameter pam_hid = new SqlParameter("@HAIRDRESSER_ID", hairdresser_id);
+            SqlParameter pam_us1 = new SqlParameter("@USER_ID1", user_id_action);
+            SqlParameter pam_us2 = new SqlParameter("@USER_ID2", user_id_affect);
+            SqlParameter pam_res = new SqlParameter("@RES", SqlDbType.Bit);
                          pam_res.Direction = ParameterDirection.Output;
 
-            var consulta = this.context.Admins.FromSqlRaw(sql, pam_hid, pam_us1, pam_us2, pam_res).ToList();
-            int res = int.Parse(pam_res.Value.ToString());
-
-            return false;
+            this.context.Database.ExecuteSqlRaw(sql, pam_hid, pam_us1, pam_us2, pam_res);
+            return (bool)pam_res.Value;
         }
 
         public async Task<int> InsertAdminAsync(int hairdresser_id, int user_id, AdminRole role) {
@@ -123,17 +129,19 @@ namespace Hairdressers.Repositories {
             } else { return (int)ServerRes.RecordNotFound; }
         }
 
-        public async Task<int> DeleteAdminAsync(int hairdresser_id, int user_id, int user_id_action) {
-            if (this.GetAdmins(hairdresser_id).Count == 1) {
-                return (int)ServerRes.DeleteWithOneAdmin;
-            } else {
-                Admin? admin = this.FindAdmin(hairdresser_id, user_id);
-                if (admin != null) {
-                    this.context.Admins.Remove(admin);
-                    await this.context.SaveChangesAsync();
+        public async Task<int> DeleteAdminAsync(int hairdresser_id, int user_id_affect, int user_id_action) {
+            if (this.CompareAdminRole(hairdresser_id, user_id_action, user_id_affect)) { // Devolverá TRUE si el rango es >= que el afectado
+                if (this.GetAdmins(hairdresser_id).Count == 1) {
+                    return (int)ServerRes.DeleteWithOneAdmin;
+                } else {
+                    Admin? admin = this.FindAdmin(hairdresser_id, user_id_affect);
+                    if (admin != null) {
+                        this.context.Admins.Remove(admin);
+                        await this.context.SaveChangesAsync();
+                    }
+                    return (int)ServerRes.OK;
                 }
-            }
-            return 1;
+            } else { return (int)ServerRes.NotAuthorized; }
         }
         #endregion
 

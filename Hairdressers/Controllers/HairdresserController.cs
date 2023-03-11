@@ -24,5 +24,20 @@ namespace Hairdressers.Controllers {
             }
         }
 
+        public IActionResult CreateHairdresser(int userid) {
+            return View();
+        }
+
+        [ValidateAntiForgeryToken] [HttpPost]
+        public IActionResult CreateHairdresser(Hairdresser hairdresser) {
+            return View();
+        }
+
+        [ValidateAntiForgeryToken] [HttpPost]
+        public async Task<IActionResult> UpdateHairdresser(Hairdresser hairdresser) {
+            //await this.repo_hairdresser.UpdateHairdresserAsync
+            return RedirectToAction("ControlPanel", "Hairdresser");
+        }
+
     }
 }

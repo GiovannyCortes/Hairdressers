@@ -1,6 +1,7 @@
 ﻿@model User
 
 @{
+    ViewData["Title"] = "C&G: Panel de Control";
     List<Hairdresser> peluquerias = ViewData["HAIRDRESSERS"] as List<Hairdresser>;
 }
 
@@ -30,12 +31,21 @@
         @if (peluquerias != null) {
             <div class="cb_section_2" >
                 @foreach (Hairdresser h in peluquerias) {
-                    <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@h.HairdresserId" class="card no_select">
+                    <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@h.HairdresserId" class="card card_view no_select">
                         <h3>@h.Name</h3>
                         <p>@h.Address</p>
                         <p>@h.Phone</p>
                     </a>
                 }
+                <a asp-controller="Hairdresser" asp-action="CreateHairdresser" asp-route-userid="@Model.UserId" class="card card_create no_select">
+                    Añadir nueva peluquería
+                </a>
+            </div>
+        } else {
+            <div class="cb_section_2" >
+                <a asp-controller="Hairdresser" asp-action="CreateHairdresser" asp-route-userid="@Model.UserId" class="card card_create no_select">
+                    Añadir nueva peluquería
+                </a>
             </div>
         }
     </div>

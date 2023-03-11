@@ -7,10 +7,10 @@ namespace Hairdressers.Interfaces {
         #region ADMIN
         Admin? FindAdmin(int hairdresser_id, int user_id);
         List<Admin> GetAdmins(int hairdresser_id);
-        bool CompareAdminRole(int user_id1, int user_id2); // True: user_id1 > user_id2
+        bool CompareAdminRole(int hairdresser_id, int user_id_action, int user_id_affect); // True: user_id1 > user_id2
         Task<int> InsertAdminAsync(int hairdresser_id, int user_id, AdminRole role);
         Task<int> UpdateAdminAsync(int hairdresser_id, int user_id, AdminRole role);
-        Task<int> DeleteAdminAsync(int hairdresser_id, int user_id, int user_id_action);
+        Task<int> DeleteAdminAsync(int hairdresser_id, int user_id_affect, int user_id_action);
         #endregion
 
         #region USER
