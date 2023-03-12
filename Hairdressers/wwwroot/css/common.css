@@ -35,8 +35,8 @@ body::-webkit-scrollbar {
 }
 
 .shadow {
-    -webkit-box-shadow: 0 6px 5px -2px rgb(10, 10, 10);
-    -moz-box-shadow: 0 6px 5px -2px rgb(10, 10, 10);
+    -webkit-box-shadow: 0 5px 9px -2px rgb(10, 10, 10);
+    -moz-box-shadow: 0 5px 9px -2px rgb(10, 10, 10);
     box-shadow: 0 5px 9px -2px rgb(10, 10, 10);
 }
 
@@ -55,6 +55,10 @@ body::-webkit-scrollbar {
     margin: auto auto 50px auto;
 }
 
+h3 {
+    text-transform: uppercase;
+}
+
 #bkg_video {
     position: absolute;
     right: 0;
@@ -66,8 +70,20 @@ body::-webkit-scrollbar {
     filter: opacity(0.5);
 }
 
+/* ARREGLAR ESTOS BACKGROUND PARA NO DUPLICAR CÓDIGO */
 #background {
     background-color: var(--main-blue);
+    /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+#background_2 {
+    background-color: var(--main-red);
     /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
     width: 100vw;
     height: 100vh;
@@ -101,6 +117,7 @@ body::-webkit-scrollbar {
     font-size: 1em;
     line-height: 1.5em;
     border-radius: 5px;
+    border-color: lightslategray;
 }
 
 .form-error-message {

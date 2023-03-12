@@ -17,5 +17,7 @@ namespace Hairdressers.Models {
         [Column("active")]
         public bool Active { get; set; }
 
+        public virtual ICollection<Schedule_Row> ScheduleRows { get; set; }
+
     }
 }

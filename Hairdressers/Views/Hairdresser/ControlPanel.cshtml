@@ -13,19 +13,7 @@
             <p>@Model.Address</p>
             <p>@Model.Phone</p>
         </div>
-        <form method="post" action="CreateHairdresser" class="data hide" style="margin-top: 10px;">
-            @Html.AntiForgeryToken()
-            <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" />
-            <div class="form_div_flex">
-                <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" />
-                <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" />
-            </div>
-            <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" />
-            <button class="form-button-submit">
-                Guardar cambios
-            </button>
-        </form>
-@*        @if (peluquerias != null) { NECESITAMOS LISTADO DE SCHEDULES
+@*        @if ( != null) {
             <div class="cb_section_2" >
                 @foreach (Hairdresser h in peluquerias) {
                     <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@h.HairdresserId" class="card no_select">
@@ -36,6 +24,18 @@
                 }
             </div>
         }*@
+        <form method="post" action="UpdateHairdresser" class="data hide" style="margin-top: 10px;">
+            @Html.AntiForgeryToken()
+            <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" value="@Model.Name" />
+            <div class="form_div_flex">
+                <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" value="@Model.Address" />
+                <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" value="@Model.PostalCode" />
+            </div>
+            <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" value="@Model.Phone" />
+            <button class="form-button-submit">
+                Guardar cambios
+            </button>
+        </form>
     </div>
 </div>
 

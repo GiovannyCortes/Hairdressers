@@ -8,13 +8,13 @@ namespace Hairdressers.Extensions {
             if(json == null) {
                 return default(T);
             } else {
-                T data = HelperJsonSession.DeserializeObject<T>(json);
+                T data = HelperJson.DeserializeObject<T>(json);
                 return data;
             }
         }
 
         public static void SetObject (this ISession session, string key, object value) {
-            string data = HelperJsonSession.SerializeObject(value);
+            string data = HelperJson.SerializeObject(value);
             session.SetString(key, data);
         }
 

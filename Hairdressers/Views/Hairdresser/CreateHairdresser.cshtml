@@ -7,15 +7,23 @@
     <h1 class="title_form no_select data">Nueva Peluquería</h1>
     <div class="container_box">
         <input type="text" id="autocomplete" class="form-control autocomplete_box" placeholder="Buscador de peluquerías..."/>
-        <form method="post" action="CreateHairdresser" class="data" style="margin-top: 10px;">
+        <form method="post" id="form_CreateHairdresser" action="CreateHairdresser" class="data" style="margin-top: 10px;">
             @Html.AntiForgeryToken()
+            <input type="hidden" id="schedules" name="schedules" />
+            <h3 class="no_select">Información del establecimiento</h3>
             <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" />
             <div class="form_div_flex">
                 <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" />
                 <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" />
             </div>
             <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" />
-            <button class="form-button-submit">
+            <hr />
+            <h3 class="title-schedule no_select">Horario</h3>
+            <div id="schedules_container"></div>
+            <div id="form-schedule-add" class="form-schedule">
+                <i class="fa fa-circle-plus"></i>
+            </div>
+            <button type="button" onclick="nuria()" class="form-button-submit no_select">
                 Guardar cambios
             </button>
         </form>
@@ -23,40 +31,185 @@
 </div>
 
 @section createhairdresser_script {
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAg4OpucveKYKlYtgmtG5RmCiKJSRCfK9I&callback=initAutocomplete" async defer></script>
     <script>
-        function getGoogleMapsIframe(address) {
-            const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(address)}&key=AIzaSyAg4OpucveKYKlYtgmtG5RmCiKJSRCfK9I`;
-            const iframe = document.createElement('iframe');
-            iframe.setAttribute('src', mapUrl);
-            iframe.setAttribute('width', '600');
-            iframe.setAttribute('height', '450');
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('style', 'border:0');
-            document.getElementById("mapas").appendChild(iframe);
-        }
+        $(document).ready(function () {
+            var scheduleCounter = 1; // contador para generar un identificador único para cada nuevo horario
+
+            $("#form-schedule-add").click(function (event) {
+                event.preventDefault();
+
+                // Crear el nuevo elemento div y agregar las clases correspondientes
+                var newSchedule = $("<div>").addClass("form-schedule").attr("name", "schedule_" + scheduleCounter);
+
+                // Crear los elementos dentro del nuevo elemento div
+                var timesDiv = $("<div>").addClass("form-schedule-times");
+                var startLabel = $("<label>").addClass("no_select").text("Apertura");
+                var startInput = $("<input>").addClass("form-startTime form-time").attr("type", "time").attr("value", "08:30");
+                var endInput = $("<input>").addClass("form-endTime form-time").attr("type", "time").attr("value", "14:30");
+                var endLabel = $("<label>").addClass("no_select").text("Cierre");
+                timesDiv.append(startLabel, startInput, endInput, endLabel);
+
+                var daysDiv = $("<div>").addClass("form-schedule-days");
+                var daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+                var daysOfWeekES = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+                for (var i = 0; i < daysOfWeek.length; i++) {
+                    var day = daysOfWeek[i];
+                    var dayES = daysOfWeekES[i];
+                    var checkboxDiv = $("<div>").addClass("checkbox");
+                    var checkboxInput = $("<input>").attr("type", "checkbox").attr("id", day + "_" + scheduleCounter).addClass("checkbox-flip").attr("value", day);
+                        checkboxInput.prop("checked", (i <= 4));
+                    var checkboxLabel = $("<label>").attr("for", day + "_" + scheduleCounter).html("<span></span>" + dayES.substr(0, 1));
+                    checkboxDiv.append(checkboxInput, checkboxLabel);
+                    daysDiv.append(checkboxDiv);
+                }
+
+                // Agregar los elementos al nuevo elemento div y agregar el nuevo elemento al contenedor
+                newSchedule.append(timesDiv, daysDiv);
+                $("#schedules_container").append(newSchedule);
+
+                // Incrementar el contador de horarios
+                scheduleCounter++;
+            });
+
+        });
+        
+        function nuria() {
+            const schedules = collectScheduleData();
+
+            console.log(JSON.stringify(schedules));
+            console.log(schedules);
+
+            $("#schedules").val(JSON.stringify(schedules));
+            $("#form_CreateHairdresser").submit();
+        };
 
         function initAutocomplete() {
-            const input = document.getElementById('autocomplete');
-            const autocomplete = new google.maps.places.Autocomplete(input);
+            var input = $('#autocomplete')[0];
+            var autocomplete = new google.maps.places.Autocomplete(input);
             autocomplete.addListener('place_changed', function () {
-                const place = autocomplete.getPlace();
-                //console.log(place.types);
+                var place = autocomplete.getPlace();
 
                 if (place.types.includes("hair_care")) {
                     var postalCode = place.address_components[place.address_components.length - 1].long_name;
                     var cp_index = (place.formatted_address).indexOf(postalCode);
 
-                    var address = (cp_index != -1)? (place.formatted_address).substring(0, cp_index) : (place.formatted_address).split(",",1)[0];
+                    var address = (cp_index != -1) ? (place.formatted_address).substring(0, cp_index) : (place.formatted_address).split(",", 1)[0];
 
-                    document.getElementById('h_name').value = place.name;
-                    document.getElementById('h_address').value = address.trim().replace(/(^,)|(,$)/g, "");
-                    document.getElementById('h_postalCode').value = postalCode;
-                    document.getElementById('h_phone').value = place.formatted_phone_number;
+                    $('#h_name').val(place.name);
+                    $('#h_address').val(address.trim().replace(/(^,)|(,$)/g, ""));
+                    $('#h_postalCode').val(postalCode);
+                    $('#h_phone').val(place.formatted_phone_number);
                 }
 
-                console.log(place);
-                //getGoogleMapsIframe(place.formatted_address);
+                //console.log(place);
             });
+        }
+
+        function collectScheduleData() {
+            const schedules = [];
+            $('div[name^="schedule_"]').each(function() {
+                const startTime = $(this).find('.form-startTime').val();
+                const endTime = $(this).find('.form-endTime').val();
+                const days = [];
+                $(this).find('.checkbox input:checked').each(function() {
+                    days.push($(this).val());
+                });
+                schedules.push({
+                    Start: startTime,
+                    End: endTime,
+                    Monday: $.inArray("Monday", days) !== -1,
+                    Tuesday: $.inArray("Tuesday", days) !== -1,
+                    Wednesday: $.inArray("Wednesday", days) !== -1,
+                    Thursday: $.inArray("Thursday", days) !== -1,
+                    Friday: $.inArray("Friday", days) !== -1,
+                    Saturday: $.inArray("Saturday", days) !== -1,
+                    Sunday: $.inArray("Sunday", days) !== -1
+                });
+            });
+            return schedules;
         }
     </script>
 }
+
+@* 
+    ============================= initAutocomplete VERSION JS PURO =============================
+    function initAutocomplete() {
+        const input = document.getElementById('autocomplete');
+        const autocomplete = new google.maps.places.Autocomplete(input);
+        autocomplete.addListener('place_changed', function () {
+            const place = autocomplete.getPlace();
+
+            if (place.types.includes("hair_care")) {
+                var postalCode = place.address_components[place.address_components.length - 1].long_name;
+                var cp_index = (place.formatted_address).indexOf(postalCode);
+
+                var address = (cp_index != -1)? (place.formatted_address).substring(0, cp_index) : (place.formatted_address).split(",",1)[0];
+
+                document.getElementById('h_name').value = place.name;
+                document.getElementById('h_address').value = address.trim().replace(/(^,)|(,$)/g, "");
+                document.getElementById('h_postalCode').value = postalCode;
+                document.getElementById('h_phone').value = place.formatted_phone_number;
+            }
+
+            console.log(place);
+        });
+    }
+*@
+
+@*  
+    ============================= form-schedule VERSION JS PURO =============================
+    <div class="form-schedule">
+        <div class="form-schedule-times">
+            <label class="no_select">Apertura</label>
+            <input type="time" class="form-startTime form-time" value="08:30" />
+            <input type="time" class="form-endTime form-time" value="14:30" />
+            <label class="no_select">Cierre&nbsp;&nbsp;</label>
+        </div>
+        <div class="form-schedule-days">
+            <div class="checkbox">
+                <input type="checkbox" id="Monday_1" class="checkbox-flip" value="Monday" checked />
+                <label for="Monday_1"><span></span>L</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Tuesday_1" class="checkbox-flip" value="Tuesday" checked />
+                <label for="Tuesday_1"><span></span>M</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Wednesday_1" class="checkbox-flip" value="Wednesday" checked />
+                <label for="Wednesday_1"><span></span>X</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Thursday_1" class="checkbox-flip" value="Thursday" checked />
+                <label for="Thursday_1"><span></span>J</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Friday_1" class="checkbox-flip" value="Friday" checked />
+                <label for="Friday_1"><span></span>V</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Saturday_1" class="checkbox-flip" value="Saturday" />
+                <label for="Saturday_1"><span></span>S</label>
+            </div>
+            <div class="checkbox">
+                <input type="checkbox" id="Sunday_1" class="checkbox-flip" value="Sunday" />
+                <label for="Sunday_1"><span></span>D</label>
+            </div>
+        </div>
+    </div>
+*@
+
+@*
+    ============================= insertmap VERSION JS PURO =============================
+    function getGoogleMapsIframe(address) {
+        const mapUrl = `http   s://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(address)}&key=AIzaSyAg4OpucveKYKlYtgmtG5RmCiKJSRCfK9I`;
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('src', mapUrl);
+        iframe.setAttribute('width', '600');
+        iframe.setAttribute('height', '450');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('style', 'border:0');
+        document.getElementById("mapas").appendChild(iframe);
+        //getGoogleMapsIframe(place.formatted_address);
+    }
+*@

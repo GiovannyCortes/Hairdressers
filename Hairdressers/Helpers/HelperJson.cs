@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace Hairdressers.helpers {
-    public class HelperJsonSession {
+    public class HelperJson {
 
         public static T DeserializeObject<T>(string data) { 
             T objeto = JsonConvert.DeserializeObject<T>(data);

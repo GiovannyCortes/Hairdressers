@@ -21,6 +21,10 @@ namespace Hairdressers.Controllers {
             return View();
         }
 
+        public IActionResult DeniedAccess() {
+            return View();
+        }
+
         public IActionResult Appointments() { // Seguir con esto más tarde
             User user = HttpContext.Session.GetObject<User>("USER");
             if (user == null) {

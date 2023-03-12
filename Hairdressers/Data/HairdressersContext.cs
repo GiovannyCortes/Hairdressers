@@ -15,6 +15,11 @@ namespace Hairdressers.Data {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Admin>()
                 .HasKey(a => new { a.HairdresserId, a.UserId });
+
+            modelBuilder.Entity<Schedule>()
+                .HasMany(s => s.ScheduleRows)
+                .WithOne(s => s.Schedule)
+                .HasForeignKey(sr => sr.ScheduleId);
         }
 
     }

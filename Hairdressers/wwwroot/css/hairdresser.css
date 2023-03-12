@@ -28,3 +28,139 @@
     width: 30%;
     margin-left: 2%;
 }
+
+.title-schedule {
+    margin-top: 10px;
+}
+
+#schedules_container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.form-schedule {
+    width: 100%;
+    margin-block: 10px;
+    border-radius: 25px;
+    padding-block: 10px;
+    background-color: rgb(239, 239, 239);
+    -webkit-box-shadow: 4px 6px 10px -6px rgb(80, 80, 80);
+    -moz-box-shadow: 4px 6px 10px -6px rgb(80, 80, 80);
+    box-shadow: 4px 6px 10px -6px rgb(80, 80, 80);
+}
+
+#form-schedule-add {
+    cursor: pointer;
+}
+
+#form-schedule-add:hover, #form-schedule-add:active {
+    background-color: lightgray;
+}
+
+#form-schedule-add > i {
+    color: #FF4040;
+    font-size: 2em;
+    cursor: pointer;
+}
+
+.form-schedule-times {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+}
+
+.form-schedule-times > label {
+    margin-inline: 5px;
+}
+
+.form-time {
+    padding: 3px 4px 3px 3px;
+    border-radius: 10px;
+    border-width: 2px;
+    border-color: lightgray;
+    font-size: 1em;
+}
+
+.form-time::-webkit-calendar-picker-indicator {
+    display: none;
+    background: none;
+}
+
+.form-startTime {
+    margin-right: 8%;
+}
+
+.form-schedule-days {
+    display: flex;
+    width: 50%;
+    margin: 10px auto 0 auto;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: space-evenly;
+    align-items: center;
+    transform: translateX(15px);
+}
+
+/* CHECKBOX STYLE */
+@keyframes pull {
+    0% {
+        height: 0;
+    }
+
+    100% {
+        height: 1.2rem;
+    }
+}
+
+@keyframes pop {
+    0% {
+        opacity: 0;
+    }
+
+    75% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.2);
+    }
+}
+
+.checkbox-flip {
+    display: none;
+}
+
+.checkbox-flip + label span {
+    display: inline-block;
+    transform: translateX(-25px) translateY(-15px);
+}
+
+.checkbox-flip + label span:before, .checkbox-flip + label span:after {
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+    content: "";
+    position: absolute;
+    z-index: 1;
+    width: 1rem;
+    height: 1rem;
+    background: transparent;
+    border: 2px solid #FF4040;
+}
+
+.checkbox-flip + label span:after {
+    z-index: 0;
+    border: none;
+}
+
+.checkbox-flip:checked + label span:before {
+    -webkit-transform: rotateY(180deg);
+    -moz-transform: rotateY(180deg);
+    -ms-transform: rotateY(180deg);
+    -o-transform: rotateY(180deg);
+    transform: rotateY(180deg);
+    background: #FF4040;
+}
