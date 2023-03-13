@@ -241,11 +241,20 @@ namespace Hairdressers.Repositories {
             return consulta.ToList();
         }
 
-        public List<Schedule> GetSchedules(int hairdresser_id) {
+        public List<Schedule> GetSchedules(int hairdresser_id, bool getrows) {
             var consulta = from data in this.context.Schedules
                            where data.HairdresserId == hairdresser_id
                            select data;
-            return consulta.ToList();
+            List<Schedule> schedules = consulta.ToList();
+            if (getrows) {
+                foreach (Schedule sch in schedules) {
+                    List<Schedule_Row> schedule_rows = this.GetScheduleRows(sch.ScheduleId);
+                    foreach (Schedule_Row row in schedule_rows) {
+                        sch.ScheduleRows.Add(row);
+                    }
+                }
+            }
+            return schedules;
         }
 
         public Schedule? FindSchedule(int schedule_id) {

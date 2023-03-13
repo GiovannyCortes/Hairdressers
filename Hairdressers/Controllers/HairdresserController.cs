@@ -19,8 +19,8 @@ namespace Hairdressers.Controllers {
                 int hairdresser_id = int.Parse(hid);
                 Hairdresser? hairdresser = this.repo_hairdresser.FindHairdresser(hairdresser_id);
                 if (hairdresser != null) {
-                    //Schedule sche = this.repo_hairdresser.FindSchedule(1);
-                    //sche.ScheduleRows = this.repo_hairdresser.GetScheduleRows(sche.ScheduleId);
+                    List<Schedule> schedules = this.repo_hairdresser.GetSchedules(hairdresser_id, true);
+                    ViewData["SCHEDULES"] = schedules;
                     return View(hairdresser);
                 } else {
                     ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";

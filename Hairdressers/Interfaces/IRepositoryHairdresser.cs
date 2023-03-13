@@ -30,7 +30,7 @@ namespace Hairdressers.Interfaces {
 
         #region SCHEDULE
         List<string> GetNameSchedules(int hairdresser_id);
-        List<Schedule> GetSchedules(int hairdresser_id);
+        List<Schedule> GetSchedules(int hairdresser_id, bool getrows);
         Schedule? FindSchedule(int schedule_id);
         Task<int> InsertScheduleAsync(int hairdresser_id, string name, bool active);
         Task UpdateScheduleAsync(int schedule_id, int hairdresser_id, string name, bool active);
