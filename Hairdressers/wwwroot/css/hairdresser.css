@@ -40,8 +40,8 @@
 }
 
 .form-schedule {
-    width: 100%;
-    margin-block: 10px;
+    width: 98%;
+    margin: 10px auto;
     border-radius: 25px;
     padding-block: 10px;
     background-color: rgb(239, 239, 239);
@@ -70,6 +70,7 @@
     justify-content: center;
     align-items: center;
     align-content: center;
+    margin-top: 5px;
 }
 
 .form-schedule-times > label {
@@ -101,7 +102,15 @@
     align-content: center;
     justify-content: space-evenly;
     align-items: center;
-    transform: translateX(15px);
+    transform: translateX(33px);
+}
+
+.close_icon {
+    float: right;
+    font-size: 40px;
+    transform: translateY(-42%) translateX(-50%);
+    cursor: pointer;
+    color: #FF4040;
 }
 
 /* CHECKBOX STYLE */

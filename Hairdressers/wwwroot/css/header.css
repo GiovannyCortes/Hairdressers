@@ -84,7 +84,7 @@
 }
 
 .navbar_list_item:hover {
-    background-color: var(--main-blue);
+    background-color: var(--second-blue);
     color: white;
     box-shadow: 0 2px 5px 1px rgba(100, 100, 100, 0.8);
 }

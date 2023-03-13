@@ -127,7 +127,7 @@ h3 {
     animation: shake 1s;
 }
 
-.form-button-submit {
+.form-button {
     position: relative;
     text-transform: uppercase;
     text-decoration: none;
@@ -139,22 +139,27 @@ h3 {
     border: none;
     font-family: inherit;
     font-weight: 700;
-    color: white;
-    background-color: mediumseagreen;
     cursor: pointer;
 }
 
-.form-button-submit:hover {
+.form-button-cancel {
+    float: right;
+    margin-right: 2%;
+    color: white;
+    background-color: rgb(90, 90, 90);
+}
+
+.form-button-create {
+    color: white;
+    background-color: mediumseagreen;
+}
+
+.form-button-create:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.form-button-submit:active {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-}
-
-.form-button-submit::after {
+.form-button-create::after {
     content: "";
     display: inline-block;
     height: 100%;
@@ -167,11 +172,18 @@ h3 {
     transition: all .4s;
 }
 
-.form-button-submit::after {
+.form-button-create::after {
     background-color: mediumseagreen;
 }
 
-.form-button-submit:hover::after {
+.form-button-create:hover::after {
     transform: scaleX(1.4) scaleY(1.6);
     opacity: 0;
+}
+
+.btn_container_submit_cancel {
+    display: grid;
+    align-items: center;
+    justify-items: center;
+    grid-template-columns: 1fr minmax(5px, 0.25fr) 1fr minmax(5px, 0.25fr) 1fr;
 }

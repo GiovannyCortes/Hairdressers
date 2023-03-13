@@ -266,7 +266,7 @@ namespace Hairdressers.Repositories {
 
         public async Task<int> InsertScheduleAsync(int hairdresser_id, string name, bool active) {
             if (active) {
-                List<Schedule> schedules = this.GetSchedules(hairdresser_id);
+                List<Schedule> schedules = this.GetSchedules(hairdresser_id, false);
                 foreach (Schedule sch in schedules) {
                     if (sch.Active) { sch.Active = false; }
                 }
@@ -292,7 +292,7 @@ namespace Hairdressers.Repositories {
                 schedule.Active = active;
 
                 if (active) {
-                    List<Schedule> schedules = this.GetSchedules(hairdresser_id);
+                    List<Schedule> schedules = this.GetSchedules(hairdresser_id, false);
                     foreach (Schedule sch in schedules) {
                         if (sch.ScheduleId != schedule_id && sch.Active) { sch.Active = false; }
                     }

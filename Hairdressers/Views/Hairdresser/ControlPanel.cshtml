@@ -7,24 +7,37 @@
 
 <div id="background"></div>
 <div class="mauto">
-    <h1 class="title_form no_select data">@Model.Name <i class="fa fa-pen-to-square icon_h1"></i></h1>
+    <h1 class="title_form no_select data">@Model.Name</i></h1>
     <h1 class="title_form no_select data hide">Editar Peluquería</h1>
-    <div class="container_box">
-        <div class="data">
+    <div class="container_box data">
+        <div class="btn_container_actions">
+            <button class="btn_update btn_showers">Editar peluquería</button>
+            <button id="btn_delete" class="btn_danger">Eliminar peluquería</button>
+        </div>
+        <div>
             <p>@Model.Address</p>
             <p>@Model.Phone</p>
         </div>
         @if (schedules != null) {
             <div class="cb_section_2" >
                 @foreach (Schedule sche in schedules) {
-                    <h2>@sche.Name</h2>
-                    @foreach (Schedule_Row row in sche.ScheduleRows) {
-                        
-                    }
+                    <div class="schedule_item no_select">
+                        <h2>@sche.Name</h2>
+                        @foreach (Schedule_Row row in sche.ScheduleRows) {
+                            string days = FormatDays(row.Monday, row.Tuesday, row.Wednesday, row.Thursday, row.Friday, row.Saturday, row.Sunday);
+                            <ul class="schedule_item_list">
+                                <li>@row.Start.ToString(@"hh\:mm")</li>
+                                <li>@row.End.ToString(@"hh\:mm")</li>
+                                <li>@days</li>
+                            </ul>
+                        }
+                    </div>
                 }
             </div>
         }
-        <form method="post" action="UpdateHairdresser" class="data hide" style="margin-top: 10px;">
+    </div>
+    <div class="container_box data hide">
+        <form method="post" action="UpdateHairdresser" style="margin-top: 10px;">
             @Html.AntiForgeryToken()
             <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" value="@Model.Name" />
             <div class="form_div_flex">
@@ -32,19 +45,96 @@
                 <input type="text" id="h_postalCode" name="PostalCode" class="form-control" maxlength="5" placeholder="Código Postal" value="@Model.PostalCode" />
             </div>
             <input type="text" id="h_phone" name="Phone" class="form-control" maxlength="20" placeholder="Teléfono" value="@Model.Phone" />
-            <button class="form-button-submit">
-                Guardar cambios
-            </button>
+            <div class="btn_container_submit_cancel">
+                <span></span>
+                <span></span>
+                <button class="form-button form-button-create no_select">
+                    Guardar cambios
+                </button>
+                <span></span>
+                <div style="width: 100%;">
+                    <button type="button" class="form-button form-button-cancel btn_showers no_select">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
 </div>
 
 @section hairdresser_script{
     <script>
+        var edit_mode = false;
         $(function() {
-            $('.icon_h1').click(function() {
+            $('.btn_showers').click(function() {
+                edit_mode = !edit_mode;
+                if (edit_mode == false) { // Si pulso cancelar
+                    $("#h_name").val("@Html.Raw(Model.Name)");
+                    $("#h_address").val("@Html.Raw(Model.Address)");
+                    $("#h_postalCode").val("@Html.Raw(Model.PostalCode)");
+                    $("#h_phone").val("@Html.Raw(Model.Phone)");
+                }
                 $('.data').toggleClass('hide');
             });
         });
+
+        $(function () {
+            $('#btn_delete').click(function () {
+                Swal.fire({
+                    title: "¿Está segur@@ de que desea eliminar esta peluquería?",
+                    text: "Esta acción no podrá revertirse",
+                    icon: "warning",
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/Landing/Index",
+                            success: function (res) {
+                                window.location = "/Landing/Index";
+                            }
+                        });
+                    }
+                });
+            });
+        });
     </script>
+}
+
+@functions {
+    public string FormatDays(bool monday, bool tuesday, bool wednesday, bool thursday, bool friday, bool saturday, bool sunday) {
+        var dayNames = new List<string> { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+        var selectedDays = new List<string>();
+
+        if (monday) selectedDays.Add("Lunes");
+        if (tuesday) selectedDays.Add("Martes");
+        if (wednesday) selectedDays.Add("Miércoles");
+        if (thursday) selectedDays.Add("Jueves");
+        if (friday) selectedDays.Add("Viernes");
+        if (saturday) selectedDays.Add("Sábado");
+        if (sunday) selectedDays.Add("Domingo");
+
+        if (selectedDays.Count == 1) { // Un único día
+            return selectedDays[0];
+        } else if (selectedDays.Count == 2) { // Dos días
+            return $"{selectedDays[0]} y {selectedDays[1]}";
+        } else if (selectedDays.Count > 2) {
+            bool consecutives = true;
+            for (int i = 0; i < selectedDays.Count; i++) {
+                if (i != 0 && !checkConsecutiveDays(selectedDays[i], selectedDays[i-1])) { consecutives = false; }
+            }
+            if (consecutives) {
+                return $"De {selectedDays.First()} a {selectedDays.Last()}";
+            } else {
+                return string.Join(", ", selectedDays);
+            }
+        }
+        return "No hay días seleccionados";
+    }
+
+    private bool checkConsecutiveDays(string day1, string day2) {
+        var dayNames = new[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+        int index1 = Array.IndexOf(dayNames, day1);
+        int index2 = Array.IndexOf(dayNames, day2);
+        return Math.Abs(index1 - index2) == 1 || Math.Abs(index1 - index2) == 6; // Cálculo de diferencia circular entre 2 días
+    }
 }
