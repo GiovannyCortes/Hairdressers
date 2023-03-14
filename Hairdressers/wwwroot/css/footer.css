@@ -1,6 +1,6 @@
 ﻿.footer {
     display: flex;
-    width: 100vw;
+    /*width: 100vw;*/
     height: 220px;
     overflow: hidden;
     flex-flow: row wrap;

@@ -41,11 +41,7 @@ namespace Hairdressers.Controllers {
         }
 
         public async Task<IActionResult> Prueba() {
-            //await this.repo_hairdresser.InsertHairdresserAsync("ESTUDIO DE PRUEBA", "5165156", "MI CASA", 65980, 1);
-            ////List<Hairdresser> hairdressers = this.repo_hairdresser.GetHairdressers(1);
-            List<Hairdresser> hairdressers = this.repo_hairdresser.GetHairdressers();
-            ViewData["DATO"] = this.repo_hairdresser.CompareAdminRole(1, 1, 2);
-            return View(hairdressers);
+            return View();
         }
 
     }

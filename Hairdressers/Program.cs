@@ -28,7 +28,7 @@ var app = builder.Build();
     app.UseSession();
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Landing}/{action=Index}"
+        pattern: "{controller=Redirect}/{action=Prueba}"
     );
 
 app.Run();
