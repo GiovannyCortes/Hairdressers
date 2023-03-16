@@ -73,7 +73,8 @@ h3 {
 /* ARREGLAR ESTOS BACKGROUND PARA NO DUPLICAR CÓDIGO */
 #background {
     background-color: var(--main-blue);
-    /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
+    background-image: url("../images/patrones/PatronTres.png");
+    background-size: 100px;
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -84,7 +85,6 @@ h3 {
 
 #background_2 {
     background-color: var(--main-red);
-    /*background: linear-gradient(30deg, rgba(156,72,81,1) 10%, rgba(68,68,70,1) 10%, rgba(68,68,70,1) 15%, rgba(65,80,115,1) 15%);*/
     width: 100vw;
     height: 100vh;
     position: fixed;
