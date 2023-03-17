@@ -45,5 +45,12 @@ namespace Hairdressers.Interfaces {
         Task DeleteScheduleRowsAsync(int schedule_row_id);
         #endregion
 
+        #region APPOINTMENTS
+        Task<Appointment> FindAppoinmentAsync(int appointment_id);
+        Task<List<Appointment>> GetAppointmentsByHairdresserAsync(int hairdresser_id);
+        Task<List<Appointment>> GetAppointmentsByUserAsync(int user_id);
+        Task UpdateAppointmentAsync(int appointment_id, DateOnly date, TimeSpan time);
+        #endregion
+
     }
 }

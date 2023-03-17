@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
         options.IdleTimeout = TimeSpan.FromMinutes(30);
     });
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
 
     builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
     builder.Services.AddDbContext<HairdressersContext> (
@@ -28,7 +28,7 @@ var app = builder.Build();
     app.UseSession();
     app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Redirect}/{action=Prueba}"
+        pattern: "{controller=Landing}/{action=Index}"
     );
 
 app.Run();

@@ -422,5 +422,9 @@ namespace Hairdressers.Repositories {
         }
         #endregion
 
+        #region APPOINTMENTS
+
+        #endregion
+
     }
 }
