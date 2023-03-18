@@ -17,8 +17,8 @@ namespace Hairdressers.Controllers {
         }
 
         [ValidateAntiForgeryToken] [HttpPost]
-        public IActionResult Login(string email, string password) {
-            User? user = this.repo_hairdresser.ValidateUser(email, password);
+        public async Task<IActionResult> Login(string email, string password) {
+            User? user = await this.repo_hairdresser.ValidateUserAsync(email, password);
             if (user != null) {
                 HttpContext.Session.SetObject("USER", user);
                 return RedirectToAction("ControlPanel", "User");

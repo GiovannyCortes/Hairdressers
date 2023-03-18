@@ -1,8 +1,8 @@
-﻿using Hairdressers.Extensions;
-using Hairdressers.Models;
-using Hairdressers.Repositories;
+﻿using Hairdressers.Models;
 using Hairdressers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Hairdressers.Filters;
+using System.Security.Claims;
 
 namespace Hairdressers.Controllers {
     public class UserController : Controller {
@@ -13,23 +13,23 @@ namespace Hairdressers.Controllers {
             this.repo_hairdresser = repo_hairdresser;
         }
 
-        public IActionResult ControlPanel() {
-            User user = HttpContext.Session.GetObject<User>("USER");
-            if (user == null) {
-                ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";
-                ViewData["ERROR_MESSAGE_SUBTITLE"] = "Usuario no encontrado";
-                return RedirectToAction("Error", "Redirect");
-            } else {
-                if (this.repo_hairdresser.IsAdmin(user.UserId)) {
-                    List<Hairdresser> hairdressers = this.repo_hairdresser.GetHairdressers(user.UserId);
-                    ViewData["HAIRDRESSERS"] = hairdressers;
-                }
-                return View(user);
-            }
-        }
+        [AuthorizeUsers]
+        public async Task<IActionResult> ControlPanel() {
+            User user = new User {
+                UserId = int.Parse(HttpContext.User.FindFirst("ID").Value),
+                Name = HttpContext.User.Identity.Name,
+                LastName = HttpContext.User.FindFirst("LAST_NAME").Value,
+                Email = HttpContext.User.FindFirst("EMAIL").Value,
+                EmailConfirmed = bool.Parse(HttpContext.User.FindFirst("EMAIL_CONFIRMED").Value),
+                Phone = HttpContext.User.FindFirst("PHONE").Value
+            };
 
-        public IActionResult ClientAppointments() { // Gestión de citas (Solicitudes)
-            return View();
+            if (HttpContext.User.FindFirst(ClaimTypes.Role).Value == "ADMIN") {
+                List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersAsync(user.UserId);
+                ViewData["HAIRDRESSERS"] = hairdressers;
+            }
+
+            return View(user);
         }
 
     }

@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "C&G: Registro";
+}
+
+<div id="background"></div>
+<div class="mauto">
+    <h1 class="title_form no_select">REGISTRO</h1>
+    <form method="post" class="main_forms" onsubmit="return onSubmitClick(event);">
+        @Html.AntiForgeryToken()
+        <input type="text" class="login-control registrer-control" name="Name" maxlength="50" placeholder="Nombre" required />
+        <input type="text" class="login-control registrer-control" name="LastName" maxlength="50" placeholder="Apellidos" />
+        <input type="text" class="login-control registrer-control" name="Phone" maxlength="20" placeholder="Teléfono" />
+        <input type="email" class="login-control registrer-control" name="Email" maxlength="50" placeholder="Email" required />
+        <input type="password" oninput="preValidate()" id="registrer_password" class="login-control registrer-control pass-item" name="Password" placeholder="Contraseña" required />
+        <i id="registrer_password_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(0)"></i>
+        <input type="password" oninput="preValidate()" id="registrer_password_repeat" class="login-control registrer-control pass-item" placeholder="Repetir Contraseña" style="margin-block: 10px 0;" required />
+        <i id="registrer_password_repeat_i" class="fa fa-eye togglePassword" onClick="VisibilityPassword(1)"></i>
+        <button id="registrer_btn" class="login-form-button-submit no_select">
+            <span>Registrarme</span>
+        </button>
+    </form>
+</div>
+
+@section registrer_script {
+    <style>
+        .redborder {
+            border-color: red;
+        }
+
+        .orangeborder {
+            border-color: orange;
+        }
+    </style>
+    <script>
+        var password = $("#registrer_password");
+        var repassword = $("#registrer_password_repeat");
+
+        function onSubmitClick(e) {
+            if (password.val() !== repassword.val()) {
+                e.preventDefault();
+                password.addClass("redborder");
+                password.removeClass("orangeborder");
+                repassword.addClass("redborder");
+                repassword.removeClass("orangeborder");
+            } else {
+                password.removeClass("redborder");
+                repassword.removeClass("redborder");
+            }
+            return true;
+        }
+
+        function preValidate() {
+            if ((repassword.val() != "") && (password.val() !== repassword.val())) {
+                password.addClass("orangeborder");
+                repassword.addClass("orangeborder");
+            } else {
+                password.removeClass("orangeborder");
+                repassword.removeClass("orangeborder");
+            }
+            return true;
+        }
+
+        function VisibilityPassword(option) {
+            if (option === 0) {
+                var password = $("#registrer_password");
+                password.attr("type", (password.attr("type") == "text") ? "password" : "text");
+                $("#registrer_password_i").toggleClass("fa-eye-slash fa-eye");
+            } else {
+                var repassword = $("#registrer_password_repeat");
+                repassword.attr("type", (repassword.attr("type") == "text") ? "password" : "text");
+                $("#registrer_password_repeat_i").toggleClass("fa-eye-slash fa-eye");
+            }
+        };
+    </script>
+}

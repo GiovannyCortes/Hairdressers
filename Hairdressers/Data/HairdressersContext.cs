@@ -12,6 +12,8 @@ namespace Hairdressers.Data {
         public DbSet<Schedule_Row> Schedule_Rows { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Appointment_Service> AppointmentServices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Admin>()

@@ -1,0 +1,23 @@
+﻿@if (Context.User.Identity.IsAuthenticated == true) {
+    <li>
+        <a asp-controller="User" asp-action="ControlPanel" class="navbar_float_items" id="navbar_float_first">
+            Panel de control
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Managed" asp-action="LogOut" class="navbar_float_items" id="navbar_float_last">
+            Cerrar sesión
+        </a>
+    </li>
+} else {
+    <li>
+        <a asp-controller="User" asp-action="ControlPanel" class="navbar_float_items" id="navbar_float_first">
+            Iniciar Sesión
+        </a>
+    </li>
+    <li>
+        <a asp-controller="Managed" asp-action="Registrer" class="navbar_float_items" id="navbar_float_last">
+            Registrarme
+        </a>
+    </li>
+}

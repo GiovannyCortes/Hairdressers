@@ -1,15 +1,16 @@
 ﻿@{
     ViewData["TITLE"] = "C&G: Citas";
-    var jaime = ViewData["JAIME"];
+    var json_appointments = ViewData["JSON_APPOINTMENTS"];
+    bool? superUser = (bool?)TempData["SUPERUSUARIO"];
 }
 
 <div id="background"></div>
 <div id='calendar' style="background-color: white;"></div>
 
-@section prueba_script {
+@section calendar_script {
     <script>
 
-        const jaime = @Html.Raw(Json.Serialize(jaime));
+        const appointments = @Html.Raw(Json.Serialize(json_appointments));
 
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
@@ -50,15 +51,27 @@
                     endTime: '21:00',
                 },
                 select: function (arg) {
-                    var title = prompt('Event Title:');
-                    if (title) {
-                        calendar.addEvent({
-                            title: title,
-                            start: arg.start,
-                            end: arg.end,
-                            allDay: arg.allDay
-                        })
+                    console.log(arg);
+
+                    const { value: formValues } = Swal.fire({
+                      title: 'Solicitud de cita',
+                      html:
+                        '<input type="date" id="date_input" class="swal2-input" value="2023-03-08">' +
+                        '<input type="time" id="time_input" class="swal2-input" value="00:35">',
+                      focusConfirm: false,
+                      preConfirm: () => {
+                        return [
+                            document.getElementById('date_input').value,
+                            document.getElementById('time_input').value
+                        ]
+                      }
+                    })
+
+                    if (formValues) {
+                      Swal.fire(JSON.stringify(formValues))
+                      console.log(formValues);
                     }
+
                     calendar.unselect()
                 },
                 eventClick: function (arg) {
@@ -70,9 +83,7 @@
                 },
                 editable: true,
                 dayMaxEvents: true, // allow "more" link when too many events
-                events: [
-                    jaime
-                ]
+                events: @Html.Raw(Json.Serialize(json_appointments))
             });
 
             // calendar.setOption('slotDuration', '00:10:00');
@@ -93,3 +104,26 @@
 
     </script>
 }
+@*
+
+    Depende de arg.allDay true o false
+
+    arg.startStr: "2023-03-08"
+    arg.endStr: "2023-03-09"
+
+    arg.startStr: "2023-03-14T00:35:00+01:00"
+    arg.endStr: "2023-03-14T00:40:00+01:00"
+
+    var myDate = "2023-03-08";
+    var myTime = "00:35";
+
+    if (title) {
+        calendar.addEvent({
+            title: title,
+            start: arg.start,
+            end: arg.end,
+            allDay: arg.allDay
+        })
+    }
+
+*@

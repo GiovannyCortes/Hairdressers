@@ -24,15 +24,7 @@
             </div>
             <div id="ncontainer_div2">
                 <ul class="navbar_list rel_center no_select">
-                    <li>
-                        <a asp-controller="Landing" asp-action="Index" class="navbar_list_item">Home</a>
-                    </li>
-                    <li>
-                        <a asp-controller="Redirect" asp-action="Appointments" class="navbar_list_item">Citas</a>
-                    </li>
-                    <li>
-                        <a asp-controller="Landing" asp-action="Index" class="navbar_list_item">Help</a>
-                    </li>
+                    <partial name="_MenuNavLink" />
                 </ul>
             </div>
             <div id="ncontainer_div3">
@@ -42,29 +34,7 @@
                             <img src="~/images/icons/user.png" style="height: 100%;"/>
                         </button>
                         <ul id="navbar_float">
-                            @if (Context.Session.GetObject<User>("USER") != null) {
-                                <li>
-                                    <a asp-controller="User" asp-action="ControlPanel" class="navbar_float_items" id="navbar_float_first">
-                                        Panel de control
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Redirect" asp-action="LogOut" class="navbar_float_items" id="navbar_float_last">
-                                        Cerrar sesión
-                                    </a>
-                                </li>
-                            } else {
-                                <li>
-                                    <a asp-controller="Login" asp-action="Login" class="navbar_float_items" id="navbar_float_first">
-                                        Iniciar Sesión
-                                    </a>
-                                </li>
-                                <li>
-                                    <a asp-controller="Login" asp-action="Registrer" class="navbar_float_items" id="navbar_float_last">
-                                        Registrarme
-                                    </a>
-                                </li>
-                            }
+                            <partial name="_MenuLogin" />
                         </ul>
                     </li>
                 </ul>
@@ -118,7 +88,7 @@
     @if (IsSectionDefined("login_script")) { @RenderSection("login_script", false) }
     @if (IsSectionDefined("hairdresser_script")) { @RenderSection("hairdresser_script", false) }
     @if (IsSectionDefined("createhairdresser_script")) { @RenderSection("createhairdresser_script", false) }
-    @if (IsSectionDefined("prueba_script")) { @RenderSection("prueba_script", false) }
+    @if (IsSectionDefined("calendar_script")) { @RenderSection("calendar_script", false) }
     <script>
         $(document).ready(function() {
             $("#navbar_float").hide();

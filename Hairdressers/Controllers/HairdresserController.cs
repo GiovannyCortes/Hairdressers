@@ -3,6 +3,7 @@ using Hairdressers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Hairdressers.helpers;
 using Hairdressers.Extensions;
+using Hairdressers.Filters;
 
 namespace Hairdressers.Controllers {
     public class HairdresserController : Controller {
@@ -13,25 +14,22 @@ namespace Hairdressers.Controllers {
             this.repo_hairdresser = repo_hairdresser;
         }
 
-        public IActionResult ControlPanel(string hid) {
-            User user = HttpContext.Session.GetObject<User>("USER");
-            if (user != null) {
-                int hairdresser_id = int.Parse(hid);
-                Hairdresser? hairdresser = this.repo_hairdresser.FindHairdresser(hairdresser_id);
-                if (hairdresser != null) {
-                    List<Schedule> schedules = this.repo_hairdresser.GetSchedules(hairdresser_id, true);
-                    ViewData["SCHEDULES"] = schedules;
-                    return View(hairdresser);
-                } else {
-                    ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";
-                    ViewData["ERROR_MESSAGE_SUBTITLE"] = "Peluquería no encontrada";
-                    return RedirectToAction("Error", "Redirect");
-                }
+        [AuthorizeUsers]
+        public async Task<IActionResult> ControlPanel(string hid) {
+            int hairdresser_id = int.Parse(hid);
+            Hairdresser? hairdresser = await this.repo_hairdresser.FindHairdresserAsync(hairdresser_id);
+            if (hairdresser != null) {
+                List<Schedule> schedules = await this.repo_hairdresser.GetSchedulesAsync(hairdresser_id, true);
+                ViewData["SCHEDULES"] = schedules;
+                return View(hairdresser);
             } else {
-                return RedirectToAction("DeniedAccess", "Redirect");
+                ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";
+                ViewData["ERROR_MESSAGE_SUBTITLE"] = "Peluquería no encontrada";
+                return RedirectToAction("Error", "Managed");
             }
         }
 
+        [AuthorizeUsers]
         public IActionResult CreateHairdresser() {
             User user = HttpContext.Session.GetObject<User>("USER");
             if (user != null) {

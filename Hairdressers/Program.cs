@@ -1,34 +1,48 @@
 using Hairdressers.Data;
 using Hairdressers.Interfaces;
 using Hairdressers.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
 
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options => {
         options.IdleTimeout = TimeSpan.FromMinutes(30);
     });
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
-
     builder.Services.AddTransient<IRepositoryHairdresser, RepositoryHairdresser>();
     builder.Services.AddDbContext<HairdressersContext> (
         options => options.UseSqlServer(connectionstring)
     );
 
-builder.Services.AddAntiforgery();
-builder.Services.AddControllersWithViews();
-// Inyectamos el archivo appsettings.json como configuración del IConfiguration
-builder.Configuration.AddJsonFile("appsettings.json");
+    builder.Services.AddAuthentication(options => {
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    }).AddCookie();
+
+    builder.Services.AddAntiforgery();
+    builder.Services.AddControllersWithViews(options => {
+        options.EnableEndpointRouting = false;
+    });
+
+    builder.Configuration.AddJsonFile("appsettings.json");
 
 var app = builder.Build();
     app.UseStaticFiles();
 
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.UseSession();
-    app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Landing}/{action=Index}"
-    );
+    app.UseMvc(routes => {
+        routes.MapRoute(
+            name: "default",
+            template: "{controller=Landing}/{action=Index}"
+        );
+    });
 
 app.Run();

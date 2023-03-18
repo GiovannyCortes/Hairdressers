@@ -6,7 +6,7 @@ namespace Hairdressers.Models {
     public class Appointment {
 
         [Key] [Column("appointment_id")]
-        public int IdAppointment { get; set; }
+        public int AppointmentId { get; set; }
         
         [Column("user_id")]
         public int UserId { get; set; }
@@ -15,7 +15,7 @@ namespace Hairdressers.Models {
         public int HairdresserId { get; set; }
         
         [Column("date")]
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
         
         [Column("time")]
         public TimeSpan Time { get; set; }
