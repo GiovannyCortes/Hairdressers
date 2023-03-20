@@ -22,6 +22,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding-right: 0 !important;
 }
 
 body::-webkit-scrollbar {
@@ -53,6 +54,16 @@ body::-webkit-scrollbar {
 
 .mauto {
     margin: auto auto 50px auto;
+}
+
+.commonTitle {
+    width: 100%;
+    margin-top: 25px;
+    padding-block: 10px;
+    color: white;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: rgba(0,0,0,0.5);
 }
 
 h3 {

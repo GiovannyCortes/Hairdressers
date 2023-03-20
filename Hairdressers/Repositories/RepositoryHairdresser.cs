@@ -272,6 +272,13 @@ namespace Hairdressers.Repositories {
                            select data;
             return await consulta.FirstOrDefaultAsync();
         }
+        
+        public async Task<Schedule?> FindActiveScheduleAsync(int hairdresser_id) {
+            var consulta = from data in this.context.Schedules
+                           where data.HairdresserId == hairdresser_id && data.Active == true
+                           select data;
+            return await consulta.FirstOrDefaultAsync();
+        }
 
         public async Task<int> InsertScheduleAsync(int hairdresser_id, string name, bool active) {
             if (active) {
@@ -324,6 +331,14 @@ namespace Hairdressers.Repositories {
         public async Task<List<Schedule_Row>> GetScheduleRowsAsync(int schedule_id) {
             var consulta = from data in this.context.Schedule_Rows
                            where data.ScheduleId == schedule_id
+                           select data;
+            return await consulta.ToListAsync();
+        }
+        
+        public async Task<List<Schedule_Row>> GetActiveScheduleRowsAsync(int hairdresser_id) {
+            Schedule schedule = await this.FindActiveScheduleAsync(hairdresser_id);
+            var consulta = from data in this.context.Schedule_Rows
+                           where data.ScheduleId == schedule.ScheduleId
                            select data;
             return await consulta.ToListAsync();
         }
@@ -504,7 +519,7 @@ namespace Hairdressers.Repositories {
             return services;
         }
 
-        public async Task InsertServiceAsync(int hairdresser_id, string name, decimal price, int duracion) {
+        public async Task InsertServiceAsync(int hairdresser_id, string name, decimal price, byte duracion) {
             var newid = this.context.Services.Any() ? this.context.Services.Max(a => a.ServiceId) + 1 : 1;
             Service service = new Service {
                 ServiceId = newid, 
@@ -517,7 +532,7 @@ namespace Hairdressers.Repositories {
             await this.context.SaveChangesAsync();
         }
 
-        public async Task UpdateServiceAsync(int service_id, string name, decimal price, int duracion) {
+        public async Task UpdateServiceAsync(int service_id, string name, decimal price, byte duracion) {
             Service? service = await this.FindServiceAsync(service_id);
             if (service != null) {
                 service.Name = name;

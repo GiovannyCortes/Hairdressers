@@ -18,6 +18,9 @@ namespace Hairdressers.Data {
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.Entity<Admin>()
                 .HasKey(a => new { a.HairdresserId, a.UserId });
+            
+            modelBuilder.Entity<Appointment_Service>()
+                .HasKey(a => new { a.AppointmentId, a.ServiceId });
 
             modelBuilder.Entity<Schedule>()
                 .HasMany(s => s.ScheduleRows)

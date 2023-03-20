@@ -1,26 +1,54 @@
 ﻿@{
     ViewData["TITLE"] = "C&G: Citas";
-    var json_appointments = ViewData["JSON_APPOINTMENTS"];
-    bool? superUser = (bool?)TempData["SUPERUSUARIO"];
+    string json_appointments = ViewData["JSON_APPOINTMENTS"] as string;
+    string regexPattern = "\"([^\"]+)\":";
+    var appoinments = Regex.Replace(json_appointments, regexPattern, "$1:");
+
+    var bussiness_hours = @"[
+            {
+                daysOfWeek: [ 1, 2, 3, 4, 5, 6 ],
+                startTime: '09:00',
+                endTime: '14:00'
+            },
+            {
+                daysOfWeek: [ 1, 2, 3, 4, 5 ],
+                startTime: '17:00',
+                endTime: '21:00'
+            }
+        ]";
+
+    if (ViewData["BUSSINESS_HOURS"] != null) {
+        bussiness_hours = ViewData["BUSSINESS_HOURS"] as string;
+    }
+
+    var services_json = "";
+    if (ViewData["SERVICES"] != null) {
+        services_json = ViewData["SERVICES"] as string;
+    }
+
+    Hairdresser? hairdresser = (ViewData["HAIRDRESSER"] != null) ? ViewData["HAIRDRESSER"] as Hairdresser : null;
+    User current_user = ViewData["USER"] as User; 
+    bool? superUser = (bool?)TempData["SUPER_USER"];
 }
 
 <div id="background"></div>
+<h1 class="commonTitle no_select">Citas de @((hairdresser != null) ? hairdresser.Name : current_user.Name)</h1>
 <div id='calendar' style="background-color: white;"></div>
+
+<form method="post" id="createForm" action="CreateAppointment" style="display: none;">
+    <input type="number" id="form_UserId" name="UserId" />
+    <input type="number" id="form_HairdresserId" name="HairdresserId" />
+    <input type="date" id="form_Date" name="Date" />
+    <input type="time" id="form_Time" name="Time" />
+    <input type="text" id="form_services" name="services" />
+</form>
 
 @section calendar_script {
     <script>
 
-        const appointments = @Html.Raw(Json.Serialize(json_appointments));
-
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
-
-            var today = new Date();
-            var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-            var yyyy = today.getFullYear();
-
-            today = yyyy + "-" + mm + "-" + dd;
+            var today = GetToday();
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -45,34 +73,14 @@
                 navLinks: true, // can click day/week names to navigate views
                 selectable: true,
                 selectMirror: true,
-                businessHours: {
-                    daysOfWeek: [1, 2, 3, 4, 5],
-                    startTime: '08:00',
-                    endTime: '21:00',
-                },
+                businessHours: @Html.Raw(bussiness_hours),
                 select: function (arg) {
-                    console.log(arg);
+                    var inputDate = new Date(arg.startStr);
+                    var startDate = inputDate.toISOString().substring(0, 10);
+                    var startTime = (arg.allDay == false) ? String(inputDate.getHours()).padStart(2, '0') + ":" + String(inputDate.getMinutes()).padStart(2, '0') : "08:00";
 
-                    const { value: formValues } = Swal.fire({
-                      title: 'Solicitud de cita',
-                      html:
-                        '<input type="date" id="date_input" class="swal2-input" value="2023-03-08">' +
-                        '<input type="time" id="time_input" class="swal2-input" value="00:35">',
-                      focusConfirm: false,
-                      preConfirm: () => {
-                        return [
-                            document.getElementById('date_input').value,
-                            document.getElementById('time_input').value
-                        ]
-                      }
-                    })
-
-                    if (formValues) {
-                      Swal.fire(JSON.stringify(formValues))
-                      console.log(formValues);
-                    }
-
-                    calendar.unselect()
+                    CreateSwal(startDate, startTime);
+                    calendar.unselect();
                 },
                 eventClick: function (arg) {
                     console.log(arg);
@@ -83,7 +91,7 @@
                 },
                 editable: true,
                 dayMaxEvents: true, // allow "more" link when too many events
-                events: @Html.Raw(Json.Serialize(json_appointments))
+                events: @Html.Raw(appoinments)
             });
 
             // calendar.setOption('slotDuration', '00:10:00');
@@ -95,35 +103,154 @@
                 elements[i].removeAttribute('title');
             }
 
-            // Una idea podría ser que creasen todos los registros que fuesen
-            // Almacenarlos en extendedProps yyyy quizá revisar estos datos antes
-            // de salir de la vista (¿?) y que se confirme todo con guardar
-            // console.log(calendar.getEvents()[5].extendedProps);
+            function GetToday() {
+                var today = new Date();
+                var dd = String(today.getDate()).padStart(2, '0');
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                var yyyy = today.getFullYear();
+
+                return today = yyyy + "-" + mm + "-" + dd;
+            }
+
+            function MinutesToString(minutes) {
+                var horas = Math.floor(minutes / 60);
+                var rest = minutes % 60;
+                if (horas === 0) {
+                    return rest + 'min';
+                } else if (rest === 0) {
+                    return horas + 'h';
+                } else {
+                    return horas + 'h ' + rest + 'min';
+                }
+            }
+
+            function CreateSwal(date, time) {
+                new swal({
+                    title: 'Solicitud de cita',
+                    showCancelButton: true,
+                    confirmButtonText: 'Confirmar cita',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonText: 'Cancelar',
+                    cancelButtonColor: '#656565',
+                    customClass: "mySwal_container",
+                    html:
+                        '<p>Recordatorio: La solicitud de la cita no asegura su confirmación. Debe esperar a la respuesta del local.</p>' +
+                        '<input type="date" id="service_date" class="mySwal_inputs mySwal_inline" min="' + date + '" value="' + date + '">' +
+                        '<input type="time" id="service_time" class="mySwal_inputs mySwal_inline" value="' + time + '">' +
+                        '<div class="service_container">' +
+                        '<button class="service_button">Servicios</button>' +
+                        '<div class="service_select">' +
+                        '</div>' +
+                        '</div>',
+                    didRender: function () {
+                        const serviceSelect = $(".service_select");
+                        const services = @Html.Raw(services_json);
+
+                        $.each(services, function (index, service) {
+                            const label = $("<label>").addClass("service_label").attr("for", `service_${service.ServiceId}`);
+                            const input = $("<input>").attr("type", "checkbox").attr("id", `service_${service.ServiceId}`).attr("value", service.ServiceId);
+                            const serviceName = $("<span>").text(service.Name + " (" + MinutesToString(service.TiempoAprox) + ") - " + service.Price + "€");
+
+                            label.append(input);
+                            label.append(serviceName);
+                            serviceSelect.append(label);
+                        });
+
+                        $('.service_button').on('click', function (e) {
+                            $(this).siblings('.service_select').slideToggle();
+                            $(this).toggleClass('active');
+                        });
+
+                        $(".service_label input[type='checkbox']").change(function () {
+                            var count = $(".service_label input[type='checkbox']:checked").length;
+                            var text = (count != 0) ? (count + " servicios seleccionados") : ("SERVICIOS");
+                            $(".service_button").text(text);
+                        });
+                    },
+                    preConfirm: function () {
+                        var fecha = $('#service_date').val();
+                        var hora = $('#service_time').val();
+                        if (fecha == "" || hora == "") {
+                            return new swal({
+                                title: "Debe indicar una fecha y hora válidas",
+                                icon: "error",
+                                confirmButtonText: 'De acuerdo',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+
+                        var ahora = new Date();
+                        var fechaActual = ahora.toISOString().substr(0, 10);
+                        var horaActual = ahora.toISOString().substr(11, 5);
+
+                        var fechaString = fecha.split("-");
+                        var horaString = hora.split(":");
+                        var fechaHora = new Date(fechaString[0], fechaString[1] - 1, fechaString[2], horaString[0], horaString[1]);
+
+                        if (fecha == fechaActual) {
+                            var horaLimite = new Date(ahora.getTime() + (15 * 60 * 1000));
+                            var horalimiteString = (horaLimite.getMinutes().toString().length == 1 ? "0" : "") + horaLimite.getMinutes();
+                            if (fechaHora < horaLimite) {
+                                return new swal({
+                                    title: "No se permite solicitar una cita para una hora inferior a " + horaLimite.getHours() + ":" + horalimiteString,
+                                    icon: "warning",
+                                    confirmButtonText: 'De acuerdo',
+                                    confirmButtonColor: '#3085d6'
+                                });
+                            }
+                        }
+
+                        var checkboxes = [];
+                        $('.service_label input[type="checkbox"]').each(function () {
+                            if ($(this).prop('checked')) {
+                                checkboxes.push($(this).val());
+                            }
+                        });
+                        if (checkboxes.length == 0) {
+                            return new swal({
+                                title: "Debe seleccionar un servicio como mínimo",
+                                icon: "error",
+                                confirmButtonText: 'De acuerdo',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        }
+
+                        return new Promise(function (resolve) {
+                            resolve({
+                                user_id: @current_user.UserId,
+                                hairdresser_id: @hairdresser.HairdresserId,
+                                date: fecha,
+                                time: hora,
+                                services: checkboxes
+                            });
+                        });
+                    }
+                }).then(function (result) {
+
+                    $("#form_UserId").val(result.value.user_id);
+                    $("#form_HairdresserId").val(result.value.hairdresser_id);
+                    $("#form_Date").val(result.value.date);
+                    $("#form_Time").val(result.value.time);
+                    $("#form_services").val(result.value.services.toString());
+
+                    $("#createForm").submit();
+
+                    //alert(JSON.stringify(result.value));
+                    //$.ajax({
+                    //    url: "/Appointments/CreateAppointment",
+                    //    type: "POST",
+                    //    data: { data : JSON.stringify(result.value) },
+                    //    dataType: "json",
+                    //    contentType: "application/json",
+                    //    success: function (result) {
+                    //        console.log("Todo ok");
+                    //    }
+                    //});
+
+                }).catch(swal.noop)
+            }
 
         });
 
     </script>
 }
-@*
-
-    Depende de arg.allDay true o false
-
-    arg.startStr: "2023-03-08"
-    arg.endStr: "2023-03-09"
-
-    arg.startStr: "2023-03-14T00:35:00+01:00"
-    arg.endStr: "2023-03-14T00:40:00+01:00"
-
-    var myDate = "2023-03-08";
-    var myTime = "00:35";
-
-    if (title) {
-        calendar.addEvent({
-            title: title,
-            start: arg.start,
-            end: arg.end,
-            allDay: arg.allDay
-        })
-    }
-
-*@

@@ -18,7 +18,7 @@ namespace Hairdressers.Models {
         public decimal Price { get; set; }
         
         [Column("daprox")]
-        public int TiempoAprox { get; set; }
+        public byte TiempoAprox { get; set; }
 
     }
 }
