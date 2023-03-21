@@ -71,13 +71,23 @@ namespace Hairdressers.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAppointment(Appointment appointment, string services) {
-            int appointment_id = await this.repo.InsertAppointmentAsync(appointment.UserId, appointment.HairdresserId, appointment.Date, appointment.Time);
-            int[] services_ids = Array.ConvertAll(services.Split(','), s => int.Parse(s));
-            foreach(int service_id in services_ids) {
-                await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
-            }
-            return RedirectToAction("Appointments", new { hairdresserId = appointment.HairdresserId });
+        public async Task<IActionResult> CreateAppointment(string mydata/*Appointment appointment, string services*/) {
+            //int appointment_id = await this.repo.InsertAppointmentAsync(appointment.UserId, appointment.HairdresserId, appointment.Date, appointment.Time);
+            //int[] services_ids = Array.ConvertAll(services.Split(','), s => int.Parse(s));
+            //foreach(int service_id in services_ids) {
+            //    await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
+            //}
+            //return RedirectToAction("Appointments", new { hairdresserId = appointment.HairdresserId });
+
+            
+            var element = new {
+                user_id = "",
+                hairdresser_id = "",
+                date = "",
+                time = "",
+                services = ""
+            };
+            return RedirectToAction("Appointments", new { hairdresserId = 6 });
         }
 
         private async Task<List<Object>> GenerateInfoCalendar(List<Appointment> appointments, bool superUser) {

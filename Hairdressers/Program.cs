@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
 
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options => {

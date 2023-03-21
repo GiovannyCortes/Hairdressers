@@ -21,7 +21,7 @@
         bussiness_hours = ViewData["BUSSINESS_HOURS"] as string;
     }
 
-    var services_json = "";
+    var services_json = "[]";
     if (ViewData["SERVICES"] != null) {
         services_json = ViewData["SERVICES"] as string;
     }
@@ -34,14 +34,6 @@
 <div id="background"></div>
 <h1 class="commonTitle no_select">Citas de @((hairdresser != null) ? hairdresser.Name : current_user.Name)</h1>
 <div id='calendar' style="background-color: white;"></div>
-
-<form method="post" id="createForm" action="CreateAppointment" style="display: none;">
-    <input type="number" id="form_UserId" name="UserId" />
-    <input type="number" id="form_HairdresserId" name="HairdresserId" />
-    <input type="date" id="form_Date" name="Date" />
-    <input type="time" id="form_Time" name="Time" />
-    <input type="text" id="form_services" name="services" />
-</form>
 
 @section calendar_script {
     <script>
@@ -187,7 +179,7 @@
                         var horaString = hora.split(":");
                         var fechaHora = new Date(fechaString[0], fechaString[1] - 1, fechaString[2], horaString[0], horaString[1]);
 
-                        if (fecha == fechaActual) {
+                        if (fecha <= fechaActual) {
                             var horaLimite = new Date(ahora.getTime() + (15 * 60 * 1000));
                             var horalimiteString = (horaLimite.getMinutes().toString().length == 1 ? "0" : "") + horaLimite.getMinutes();
                             if (fechaHora < horaLimite) {
@@ -227,25 +219,10 @@
                     }
                 }).then(function (result) {
 
-                    $("#form_UserId").val(result.value.user_id);
-                    $("#form_HairdresserId").val(result.value.hairdresser_id);
-                    $("#form_Date").val(result.value.date);
-                    $("#form_Time").val(result.value.time);
-                    $("#form_services").val(result.value.services.toString());
-
-                    $("#createForm").submit();
-
-                    //alert(JSON.stringify(result.value));
-                    //$.ajax({
-                    //    url: "/Appointments/CreateAppointment",
-                    //    type: "POST",
-                    //    data: { data : JSON.stringify(result.value) },
-                    //    dataType: "json",
-                    //    contentType: "application/json",
-                    //    success: function (result) {
-                    //        console.log("Todo ok");
-                    //    }
-                    //});
+                    if (result.isConfirmed == true) {
+                        var mydatatext = JSON.stringify(result.value);
+                        $.post("/Appointments/CreateAppointment", { mydata: mydatatext }, function (data) {});
+                    }
 
                 }).catch(swal.noop)
             }
