@@ -31,12 +31,31 @@
     margin-block: 10px;
 }
 
-/* OVERRRIDE SWAL2 */
+#mySwal_info_title {
+    display: block;
+    padding: 10px !important;
+    background-color: var(--main-blue);
+    color: white;
+    margin-top: 20px;
+    border-radius: 30px;
+}
 
+#mySwal_info_container {
+    text-align: left;
+    padding: 10px 0 10px 15px;
+    border: 1px solid rgba(0,0,0,0.3); 
+    border-radius: 15px;
+}
+
+.mySwal_info:last-child {
+    margin-bottom: 0;
+}
+
+/* OVERRRIDE SWAL2 */
     .swal2-html-container {
         margin-block: 0 !important;
         overflow: hidden !important;
-}
+    }
 
     .swal2-html-container > p {
         margin: 10px auto;

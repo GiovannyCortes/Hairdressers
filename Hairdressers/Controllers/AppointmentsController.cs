@@ -30,7 +30,7 @@ namespace Hairdressers.Controllers {
         public async Task<IActionResult> Appointments(int? hairdresserId) {
             List<Appointment> appointments;
             int user_id = int.Parse(HttpContext.User.FindFirstValue("ID"));
-            bool superUser; // Determina la precisión de datos de citas a recoger y el control sobre el calendario
+            bool userView; // Determina la precisión de datos de citas a recoger y el control sobre el calendario
             Hairdresser? hairdresser = null;
             List<BussinesHours>? bussines_hours = null;
             List<Service>? services = null;
@@ -38,8 +38,8 @@ namespace Hairdressers.Controllers {
             if (hairdresserId != null) { // ¿Qué datos de citas queremos? ¿De usuario o de peluquería?
 
                 if (HttpContext.User.FindFirst(ClaimTypes.Role).Value == "ADMIN") {
-                    superUser = await this.repo.AdminExistAsync(hairdresserId.Value, user_id);
-                } else { superUser = false; }
+                    userView = await this.repo.AdminExistAsync(hairdresserId.Value, user_id);
+                } else { userView = false; }
 
                 // Recuperamos la peluquería
                 hairdresser = await this.repo.FindHairdresserAsync(hairdresserId.Value);
@@ -55,18 +55,18 @@ namespace Hairdressers.Controllers {
                 appointments = await this.repo.GetAppointmentsByHairdresserAsync(hairdresserId.Value);
 
             } else { // Se solicitan datos de citas de Usuario
-                superUser = true;
+                userView = true;
                 appointments = await this.repo.GetAppointmentsByUserAsync(user_id);
             }
 
             // La lista recuperada es transformada y enviada a la vista para su representación
-            List<Object> appointments_json = await this.GenerateInfoCalendar(appointments, superUser);
+            List<Object> appointments_json = await this.GenerateInfoCalendar(appointments, userView);
             ViewData["HAIRDRESSER"] = hairdresser;
             ViewData["SERVICES"] = (services != null && services.Count > 0) ? HelperJson.SerializeObject(services) : null;
             ViewData["BUSSINESS_HOURS"] = (bussines_hours != null) ? HelperJson.SerializeObject(bussines_hours) : null;
             ViewData["JSON_APPOINTMENTS"] = HelperJson.SerializeObject(appointments_json);
             ViewData["USER"] = await this.repo.FindUserAsync(user_id);
-            TempData["SUPER_USER"] = superUser;
+            TempData["USER_VIEW"] = userView;
             return View();
         }
 
@@ -108,7 +108,7 @@ namespace Hairdressers.Controllers {
                     foreach (Service service in services) {
                         serviceCount++;
                         string propertyName = $"service_{serviceCount}";
-                        string finalValue = service.Name + "(" + service.Price + "€)";
+                        string finalValue = service.Name + " (" + service.Price + "€)";
                         services_json.Add(propertyName, finalValue);
                     }
                 }
@@ -118,7 +118,7 @@ namespace Hairdressers.Controllers {
                     start = date + app.Time.ToString(@"hh\:mm") + ":00",
                     end = date + this.CalculateEndAppointment(app.Time, timeAprox),
                     extendedProps = services_json,
-                    description = (superUser) ? ("Precio Total: " + price + "€") : ""
+                    description = (superUser) ? ("Precio Total: " + price) : ""
                 };
 
                 appointments_json.Add(element); // Almacenamos cada elemento en el JSON a devolver

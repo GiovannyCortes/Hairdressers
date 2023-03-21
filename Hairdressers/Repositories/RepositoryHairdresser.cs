@@ -5,7 +5,6 @@ using Hairdressers.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using System.Net;
 using System.Xml.Linq;
 
 #region PROCEDURES_ADMIN
@@ -39,11 +38,37 @@ namespace Hairdressers.Repositories {
 
         #region USER
         public async Task<User?> FindUserAsync(int user_id) {
-            return await this.context.Users.FirstOrDefaultAsync(u => u.UserId == user_id);
+            var consulta = from data in this.context.Users
+                           where data.UserId == user_id
+                           select new User {
+                               UserId = data.UserId,
+                               Salt = data.Salt,
+                               Password = data.Password,
+                               PasswordRead = data.PasswordRead,
+                               Name = data.Name,
+                               LastName = data.LastName,
+                               Phone = data.Phone ?? "Sin número de teléfono",
+                               Email = data.Email,
+                               EmailConfirmed = data.EmailConfirmed
+                           };
+            return await consulta.FirstOrDefaultAsync();
         }
 
         public async Task<User?> ValidateUserAsync(string email, string password) {
-            User? user = await this.context.Users.FirstOrDefaultAsync(z => z.Email == email);
+            var consulta = from data in this.context.Users
+                           where data.Email == email
+                           select new User {
+                               UserId = data.UserId,
+                               Salt = data.Salt,
+                               Password = data.Password,
+                               PasswordRead = data.PasswordRead,
+                               Name = data.Name,
+                               LastName = data.LastName,
+                               Phone = data.Phone ?? "Sin número de teléfono",
+                               Email = data.Email,
+                               EmailConfirmed = data.EmailConfirmed
+                           };
+            User? user = await consulta.FirstOrDefaultAsync();
             if (user == null) {
                 return null;
             } else {
