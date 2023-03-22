@@ -52,7 +52,10 @@ namespace Hairdressers.Controllers {
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     userPrincipal
                 );
-                return RedirectToAction("ControlPanel", "User");
+
+                string controller = TempData["controller"].ToString();
+                string action = TempData["action"].ToString();
+                return RedirectToAction(action, controller);
             } else {
                 ViewData["VERIFICATION"] = "Credenciales incorrectas";
                 return View();

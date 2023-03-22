@@ -24,6 +24,7 @@ namespace Hairdressers.Interfaces {
         Task<Hairdresser?> FindHairdresserAsync(int hairdresser_id);
         Task<List<Hairdresser>> GetHairdressersAsync();
         Task<List<Hairdresser>> GetHairdressersAsync(int user_id);
+        Task<List<Hairdresser>> GetHairdressersByFilter(string filter);
         Task<int> InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id);
         Task UpdateHairdresserAsync(int hairdresser_id, string name, string phone, string address, int postal_code);
         Task DeleteHairdresserAsync(int hairdresser_id);

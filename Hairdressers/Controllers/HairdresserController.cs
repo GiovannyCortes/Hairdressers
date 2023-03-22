@@ -68,5 +68,12 @@ namespace Hairdressers.Controllers {
             return RedirectToAction("ControlPanel", "Hairdresser");
         }
 
+        public async Task<JsonResult> GetHairdresserSuggestions(string searchString) {
+            List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersByFilter(searchString);
+            string prueba = HelperJson.SerializeObject(hairdressers);
+            return Json(prueba);
+        }
+
+
     }
 }

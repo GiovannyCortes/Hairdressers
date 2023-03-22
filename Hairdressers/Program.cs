@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersTajamar");
+string connectionstring = builder.Configuration.GetConnectionString("SqlHairdressersHome");
 
     builder.Services.AddDistributedMemoryCache();
     builder.Services.AddSession(options => {
@@ -27,7 +27,7 @@ string connectionstring = builder.Configuration.GetConnectionString("SqlHairdres
     builder.Services.AddAntiforgery();
     builder.Services.AddControllersWithViews(options => {
         options.EnableEndpointRouting = false;
-    });
+    }).AddSessionStateTempDataProvider();
 
     builder.Configuration.AddJsonFile("appsettings.json");
 

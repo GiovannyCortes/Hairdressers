@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["TITLE"] = "C&G: Citas";
+}
+
+<div id="background"></div>
+<h1 class="commonTitle no_select">Seleccionador de citas</h1>
+
+<div class="suggestions_container">
+    <a asp-controller="Appointments" asp-action="Appointments" id="btn_user_search">Mis citas</a>
+    <input id="hairdresser_search" placeholder="Nombre de la peluquería..."/>
+    <div id="hairdresser_suggestions"></div>
+</div>
+
+@section search_script{
+    <script>
+    $(document).ready(function () {
+
+        $("#hairdresser_search").keyup(function () {
+            var searchString = $("#hairdresser_search").val();
+            if (searchString === "") {
+                $("#hairdresser_suggestions").empty();
+            } else {
+                $.get("/Hairdresser/GetHairdresserSuggestions", { searchString: searchString })
+                .done(function (data) {
+                    var hairdressers = JSON.parse(data);
+                    $("#hairdresser_suggestions").empty();
+                    $.each(hairdressers, function (index, value) {
+                        var appointmentLink = $("<a>")
+                            .attr("href", "/Appointments/Appointments?hairdresserId=" + value.HairdresserId)
+                            .addClass("button_suggestions");
+
+                        var titleLink = $("<span>").text(value.Name);
+                        var addressLink = $("<p>").text(value.Address + " (" + value.PostalCode + ")");
+                        var phoneLink = $("<p>").text(value.Phone);
+                        var iframeLink = getGoogleMapsIframe(value.Name + "," + value.Address);
+
+                        appointmentLink.append(titleLink, addressLink, phoneLink, iframeLink);
+                        $("#hairdresser_suggestions").append(appointmentLink);
+                    });
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error: " + textStatus + " - " + errorThrown);
+                });
+            }
+        });
+
+        function getGoogleMapsIframe(address) {
+            const mapUrl = `https://www.google.com/maps/embed/v1/place?q=${encodeURIComponent(address)}&key=AIzaSyAg4OpucveKYKlYtgmtG5RmCiKJSRCfK9I`;
+            const iframe = $('<iframe></iframe>', {
+                'src': mapUrl,
+                'width': '600',
+                'height': '450',
+                'frameborder': '0',
+                'style': 'border:0'
+            });
+            return iframe;
+        }
+
+    });
+    </script>
+}

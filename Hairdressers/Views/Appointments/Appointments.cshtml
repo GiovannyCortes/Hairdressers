@@ -28,7 +28,8 @@
 
     Hairdresser? hairdresser = (ViewData["HAIRDRESSER"] != null) ? ViewData["HAIRDRESSER"] as Hairdresser : null;
     User current_user = ViewData["USER"] as User; 
-    bool userView = (bool)TempData["USER_VIEW"];
+    bool administrator_privileges = (bool)TempData["ADMIN_PRIV"];
+    bool hairdresser_view = (bool)TempData["HAIRDRESSER_VIEW"];
 }
 
 <div id="background"></div>
@@ -41,7 +42,8 @@
         document.addEventListener('DOMContentLoaded', function () {
             var calendarEl = document.getElementById('calendar');
             var today = GetToday();
-            var userView = @Json.Serialize(userView);
+            var adminPriv = @Json.Serialize(administrator_privileges);
+            var hairdView = @Json.Serialize(hairdresser_view);
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -66,36 +68,43 @@
                 navLinks: true, // can click day/week names to navigate views
                 selectable: true,
                 selectMirror: true,
-                businessHours: @if(userView) { @Html.Raw("[]"); } else { @Html.Raw(bussiness_hours) } ,
+                businessHours: @if(hairdresser_view) { @Html.Raw(bussiness_hours) } else { @Html.Raw("[]"); } ,
                 select: function (arg) {
-                    if (userView) {
+                    if (hairdView) {
                         var inputDate = new Date(arg.startStr);
-                        var startDate = inputDate.toISOString().substring(0, 10);
-                        var startTime = (arg.allDay == false) ? String(inputDate.getHours()).padStart(2, '0') + ":" + String(inputDate.getMinutes()).padStart(2, '0') : "08:00";
+                        var todayDate = new Date();
+                        if (new Date(inputDate.toDateString()).getTime() < new Date(todayDate.toDateString()).getTime()) {
+                            Swal.fire({
+                                title: "No se permite solicitar una cita para un día anterior a hoy",
+                                icon: "warning",
+                                confirmButtonText: 'De acuerdo',
+                                confirmButtonColor: '#3085d6'
+                            });
+                        } else {
+                            var startDate = inputDate.toISOString().substring(0, 10);
+                            var selectedTime = (arg.allDay == false) ? inputDate : todayDate;
 
-                        CreateSwal(startDate, startTime);
-                        calendar.unselect();
+                            var startTime = String(selectedTime.getHours()).padStart(2, '0') + ":" + String(selectedTime.getMinutes()).padStart(2, '0');
+                            CreateSwal(startDate, startTime);
+                        }
                     }
+                    calendar.unselect();
                 },
                 eventClick: function (arg) {
 
-                    var title = arg.el.fcSeg.eventRange.def.title;
-                    var extprops = arg.el.fcSeg.eventRange.def.extendedProps;
-                    var start = obtenerHoraYMinutos(arg.el.fcSeg.eventRange.instance.range.start);
-                    var end = obtenerHoraYMinutos(arg.el.fcSeg.eventRange.instance.range.end);
+                    var title = (adminPriv) ? arg.el.fcSeg.eventRange.def.title : "CITA";
+                    var extprops = (adminPriv) ? arg.el.fcSeg.eventRange.def.extendedProps : @Html.Raw("{ description: '' }");
+                    var start = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.start);
+                    var end = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.end);
 
-                    CreateInfoSwal(title, extprops, start, end);
+                    CreateInfoSwal(title, extprops, start, end, adminPriv);
 
-                    // if (confirm('Are you sure you want to delete this event?')) {
-                    //   arg.event.remove()
-                    // }
                 },
                 editable: true,
                 dayMaxEvents: true, // allow "more" link when too many events
                 events: @Html.Raw(appoinments)
             });
 
-            // calendar.setOption('slotDuration', '00:10:00');
             calendar.setOption('height', 500);
             calendar.render();
 
@@ -125,43 +134,60 @@
                 }
             }
 
-            function obtenerHoraYMinutos(fechaISO) {
+            function GetTimeFromISODate(fechaISO) {
                 var fecha = new Date(fechaISO);
                 var horas = fecha.getUTCHours();
                 var minutos = fecha.getUTCMinutes();
                 return horas + ":" + (minutos < 10 ? "0" : "") + minutos;
             }
 
-            function CreateInfoSwal(title, extprops, start, end) {
+            function CreateInfoSwal(title, extprops, start, end, adminPriv) {
                 Swal.fire({
                     html: "<h2 id='mySwal_info_title'>" + title + "</h2>" +
                           "<p class='mySwal_info no_select'>Hora: <b>" + start + "</b> - <b>" + end + "</b></p>" +
                           "<div id='mySwal_info_container' class='no_select'></div>" +
                           "<p class='mySwal_info no_select'>" + extprops.description + "</p>",
-				    confirmButtonText: 'De acuerdo',
-                    confirmButtonColor: '#415073',
+				    confirmButtonText: 'Eliminar cita',
+                    confirmButtonColor: '#d33',
+				    showConfirmButton: adminPriv,
 				    showDenyButton: true,
-				    denyButtonText: 'Eliminar cita',
-				    denyButtonColor: '#d33',
+                    denyButtonText: 'De acuerdo',
+                    denyButtonColor: '#415073',
+                    reverseButtons: true,
 				    didRender: function () {
-                        var services = '';
-                        var description = '';
 
-                        $.each(extprops, function (key, value) {
-                            if (key.indexOf('service_') === 0) {
-                                services += '<p class="mySwal_info no_select">- ' + value + '</p>';
-                            } else if (key === 'description') { description = value }
+                        if (adminPriv) {
+                            var services = '';
+                            $.each(extprops, function (key, value) {
+                                if (key.indexOf('service_') === 0) {
+                                    services += '<p class="mySwal_info no_select">- ' + value + '</p>';
+                                }
+                            });
+					        $("#mySwal_info_container").append(services);
+                        }
+				    
+                    },
+                    preConfirm: function () {
+                        return new Promise(function (resolve) {
+                            resolve({
+                                permission: adminPriv,
+                                appointmentId: extprops.appoinmentId,
+                                hairdresserId: extprops.hairdresserId
+                            });
                         });
-
-					    $("#mySwal_info_container").append(services);
-				    }
+                    }
 			    }).then((result) => {
-				    if (result.isDenied) {
-					    Swal.fire(
-						    'Deleted!',
-						    'Your file has been deleted.',
-						    'success'
-					    )
+                    if (result.isConfirmed && result.value.permission) {
+                        $.post("/Appointments/DeleteAppointment", { idAppoinment: result.value.appointmentId, hairdresser_id: result.value.hairdresserId }, function (data) {
+					        Swal.fire({
+                              title: "Cita eliminada correctamente",
+                              icon: 'success',
+                              confirmButtonColor: '#3085d6',
+                              confirmButtonText: 'De acuerdo'
+                            }).then((result) => {
+                                window.location.reload();
+                            })
+                        });
 				    }
 			    });
             }
@@ -217,20 +243,20 @@
 
                         var fechaValida = false;
                         if (fecha.match(/^\d{4}\-\d{2}\-\d{2}$/)) { // Verifica si la fecha está en formato yyyy-mm-dd
-                          var partesFecha = fecha.split('-');
-                          var anio = parseInt(partesFecha[0], 10);
-                          var mes = parseInt(partesFecha[1], 10) - 1; // Los meses en JavaScript van de 0 a 11
-                          var dia = parseInt(partesFecha[2], 10);
-                          var fechaObjeto = new Date(anio, mes, dia);
-                          fechaValida = fechaObjeto.getFullYear() === anio && fechaObjeto.getMonth() === mes && fechaObjeto.getDate() === dia;
+                            var partesFecha = fecha.split('-');
+                            var anio = parseInt(partesFecha[0], 10);
+                            var mes = parseInt(partesFecha[1], 10) - 1;
+                            var dia = parseInt(partesFecha[2], 10);
+                            var fechaObjeto = new Date(anio, mes, dia);
+                            fechaValida = fechaObjeto.getFullYear() === anio && fechaObjeto.getMonth() === mes && fechaObjeto.getDate() === dia;
                         }
 
                         var horaValida = false;
                         if (hora.match(/^\d{2}\:\d{2}$/)) { // Verifica si la hora está en formato hh:mm
-                          var partesHora = hora.split(':');
-                          var horas = parseInt(partesHora[0], 10);
-                          var minutos = parseInt(partesHora[1], 10);
-                          horaValida = horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59;
+                            var partesHora = hora.split(':');
+                            var horas = parseInt(partesHora[0], 10);
+                            var minutos = parseInt(partesHora[1], 10);
+                            horaValida = horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59;
                         }
 
                         if (fecha == "" || hora == "" || !fechaValida || !horaValida) {
@@ -251,12 +277,13 @@
                             var fechaHora = new Date(fechaString[0], fechaString[1] - 1, fechaString[2], horaString[0], horaString[1]);
 
                             if (fecha <= fechaActual) {
+                                debugger;
                                 var horaLimite = new Date(ahora.getTime() + (15 * 60 * 1000));
-                                var horalimiteString = (horaLimite.getMinutes().toString().length == 1 ? "0" : "") + horaLimite.getMinutes();
+                                var horalimiteString = (horaLimite.getMinutes().toString().length == 1 ? "0" : "") + (horaLimite.getMinutes() + 1);
                                 if (fechaHora < horaLimite) {
                                     myIsConfirmed = false;
                                     return new swal({
-                                        title: "No se permite solicitar una cita para una hora inferior a " + horaLimite.getHours() + ":" + horalimiteString,
+                                        title: "No se permite solicitar una cita para una hora inferior a las " + horaLimite.getHours() + ":" + horalimiteString + " del día de hoy",
                                         icon: "warning",
                                         confirmButtonText: 'De acuerdo',
                                         confirmButtonColor: '#3085d6'
@@ -283,9 +310,9 @@
 
                         return new Promise(function (resolve) {
                             resolve({
-                                isConfirmed: myIsConfirmed,
+                                permission: myIsConfirmed,
                                 user_id: @current_user.UserId,
-                                hairdresser_id: @hairdresser.HairdresserId,
+                                hairdresser_id: @if (hairdresser_view) { @hairdresser.HairdresserId } else { @Html.Raw("0") },
                                 date: fecha,
                                 time: hora,
                                 services: checkboxes
@@ -294,7 +321,7 @@
                     }
                 }).then(function (result) {
 
-                    if (result.isConfirmed == true && result.value.isConfirmed == true) {
+                    if (result.isConfirmed == true && result.value.permission == true) {
                         var mydatatext = JSON.stringify(result.value);
                         $.post("/Appointments/CreateAppointment", { mydata: mydatatext }, function (data) {
                             window.location.reload();

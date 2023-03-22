@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/hairdresser.css"/>
     <link rel="stylesheet" href="~/css/user_admin.css"/>
     <link rel="stylesheet" href="~/css/calendarSwal.css"/>
+    <link rel="stylesheet" href="~/css/suggestions.css"/>
     <link rel="icon" type="image/x-icon" href="~/images/logos/Barber_logo_small_white.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
     <script src="~/js/jquery-3.6.3.min.js"></script>
@@ -90,6 +91,7 @@
     @if (IsSectionDefined("hairdresser_script")) { @RenderSection("hairdresser_script", false) }
     @if (IsSectionDefined("createhairdresser_script")) { @RenderSection("createhairdresser_script", false) }
     @if (IsSectionDefined("calendar_script")) { @RenderSection("calendar_script", false) }
+    @if (IsSectionDefined("search_script")) { @RenderSection("search_script", false) }
     <script>
         $(document).ready(function() {
             $("#navbar_float").hide();

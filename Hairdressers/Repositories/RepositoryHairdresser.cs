@@ -230,6 +230,20 @@ namespace Hairdressers.Repositories {
             return await consulta.ToListAsync();
         }
 
+        public async Task<List<Hairdresser>> GetHairdressersByFilter(string filter) {
+            var consulta = from data in this.context.Hairdressers
+                           where data.Name.ToLower().Contains(filter.ToLower())
+                           select new Hairdresser {
+                               HairdresserId = data.HairdresserId,
+                               Name = data.Name,
+                               Address = data.Address,
+                               PostalCode = data.PostalCode,
+                               Phone = data.Phone ?? "Sin número de teléfono"
+                           };
+            return await consulta.ToListAsync();
+
+        }
+
         public async Task<int> InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id) {
             var newid = this.context.Hairdressers.Any() ? this.context.Hairdressers.Max(s => s.HairdresserId) + 1 : 1;
             Hairdresser hairdresser = new Hairdresser {
@@ -510,6 +524,10 @@ namespace Hairdressers.Repositories {
         public async Task DeleteAppointmentAsync(int appointment_id) {
             Appointment? appointment = await FindAppoinmentAsync(appointment_id);
             if (appointment != null) {
+                List<int> app_services = await this.GetAppointmentServiceAsync(appointment_id);
+                foreach(int service in app_services) {
+                    await this.DeleteAppointmentServiceAsync(appointment_id, service);
+                }
                 this.context.Appointments.Remove(appointment);
                 await this.context.SaveChangesAsync();
             }
