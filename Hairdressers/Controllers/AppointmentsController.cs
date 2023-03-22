@@ -4,6 +4,7 @@ using Hairdressers.Helpers;
 using Hairdressers.Interfaces;
 using Hairdressers.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 
@@ -70,24 +71,14 @@ namespace Hairdressers.Controllers {
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateAppointment(string mydata/*Appointment appointment, string services*/) {
-            //int appointment_id = await this.repo.InsertAppointmentAsync(appointment.UserId, appointment.HairdresserId, appointment.Date, appointment.Time);
-            //int[] services_ids = Array.ConvertAll(services.Split(','), s => int.Parse(s));
-            //foreach(int service_id in services_ids) {
-            //    await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
-            //}
-            //return RedirectToAction("Appointments", new { hairdresserId = appointment.HairdresserId });
-
-            
-            var element = new {
-                user_id = "",
-                hairdresser_id = "",
-                date = "",
-                time = "",
-                services = ""
-            };
-            return RedirectToAction("Appointments", new { hairdresserId = 6 });
+        [HttpPost] [AuthorizeUsers]
+        public async Task<IActionResult> CreateAppointment(string mydata) {
+            GetCalendarAppointment appointment = JsonConvert.DeserializeObject<GetCalendarAppointment>(mydata);
+            int appointment_id = await this.repo.InsertAppointmentAsync(appointment.user_id, appointment.hairdresser_id, appointment.date, appointment.time);
+            foreach (int service_id in appointment.services) {
+                await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
+            }
+            return Json("/Appointments/Appointments?hairdresserId=" + appointment.hairdresser_id);
         }
 
         private async Task<List<Object>> GenerateInfoCalendar(List<Appointment> appointments, bool superUser) {
