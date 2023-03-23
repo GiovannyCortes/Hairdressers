@@ -42,6 +42,41 @@ namespace Hairdressers.Helpers {
             return client;
         }
 
+        public async Task SendMailAsync(string destinatario, string asunto, string mensaje) {
+            MailMessage mail = this.ConfigureMailMessage(destinatario, asunto, mensaje);
+            SmtpClient client = this.ConfigureSmtpClient();
+            await client.SendMailAsync(mail);
+        }
+
+        public async Task SendMailAsync(string destinatario, string asunto, string mensaje, string filePath) {
+            MailMessage mail = this.ConfigureMailMessage(destinatario, asunto, mensaje);
+            Attachment attachment = new Attachment(filePath);
+            mail.Attachments.Add(attachment);
+            SmtpClient client = this.ConfigureSmtpClient();
+            await client.SendMailAsync(mail);
+        }
+
+        public async Task SendTemplateRequestAppointment(string cliente, string destinatario, DateTime fecha, TimeSpan hora, string servicios) {
+            string mensaje = @"
+                <html>
+                <head>
+                    <meta charset='UTF-8'>
+                </head>
+                <body>
+                    <h2 style='text-aling:center;'>
+                        Solicitud de cita
+                    </h2>
+                    <p>
+                        Usuari@ <strong>" + cliente + @"</strong> solicita una cita para el día 
+                        <strong>" + fecha.ToShortDateString() + @"</strong> a las <strong>" + hora.ToString() + @"</strong>
+                    </p>
+                    <p>
+                        Vuelva a ventana de la aplicación e introduzca dicho código para verificar su cuenta
+                    </p>
+                    <center></center>
+                </body>
+                </html>";
+        }
 
         /*public int SendConfirmationEmail(string receiver, string email) {
             Random random = new Random();

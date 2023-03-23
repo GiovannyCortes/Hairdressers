@@ -81,10 +81,16 @@ namespace Hairdressers.Controllers {
         [HttpPost] [AuthorizeUsers]
         public async Task<IActionResult> CreateAppointment(string mydata) {
             GetCalendarAppointment appointment = JsonConvert.DeserializeObject<GetCalendarAppointment>(mydata);
+
+            // Creación de la cita
             int appointment_id = await this.repo.InsertAppointmentAsync(appointment.user_id, appointment.hairdresser_id, appointment.date, appointment.time);
             foreach (int service_id in appointment.services) {
                 await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
             }
+
+            // Envío del correo de confirmación
+
+
             return Json("/Appointments/Appointments?hairdresserId=" + appointment.hairdresser_id);
         }
 
