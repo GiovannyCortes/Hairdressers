@@ -1,19 +1,47 @@
-﻿namespace Hairdressers.Helpers {
+﻿using System.Net;
+using System.Net.Mail;
+
+namespace Hairdressers.Helpers {
     public class HelperEmailService {
 
-        private int _port { get; set; }
-        private string _host { get; set; }
-        private string _email { get; set; }
-        private string _sender { get; set; }
-        private string _password { get; set; }
+        private IConfiguration configuration;
 
         public HelperEmailService(IConfiguration configuration) {
-            this._host = configuration["EmailSettings:Host"];
-            this._port = Convert.ToInt32(configuration["EmailSettings:Port"]);
-            this._email = configuration["EmailSettings:Transmitter"];
-            this._sender = configuration["EmailSettings:Sender"];
-            this._password = configuration["EmailSettings:Password"];
+            this.configuration = configuration;
         }
+
+        private MailMessage ConfigureMailMessage (string destinatario, string asunto, string mensaje) {
+            string email = this.configuration.GetValue<string>("MailSettings:Credentials:User");
+            MailMessage mailMessage = new MailMessage();
+                        mailMessage.From = new MailAddress(email);
+                        mailMessage.To.Add(new MailAddress(destinatario));
+                        mailMessage.Subject = asunto;
+                        mailMessage.Body = mensaje;
+                        mailMessage.IsBodyHtml = true;
+            return mailMessage;
+        }
+
+        private SmtpClient ConfigureSmtpClient() {
+            string user = this.configuration.GetValue<string>("MailSettings:Credentials:User");
+            string password = this.configuration.GetValue<string>("MailSettings:Credentials:Password");
+
+            int port = this.configuration.GetValue<int>("MailSettings:Smtp:Port");
+            string host = this.configuration.GetValue<string>("MailSettings:Smtp:Host");
+
+            bool enableSSL = this.configuration.GetValue<bool>("MailSettings:Smtp:EnableSSL");
+            bool defaultCredentials = this.configuration.GetValue<bool>("MailSettings:Smtp:DefaultCredentials");
+
+            SmtpClient client = new SmtpClient();
+                       client.Port = port;
+                       client.Host = host;
+                       client.EnableSsl = enableSSL;
+                       client.UseDefaultCredentials = defaultCredentials;
+
+            NetworkCredential credentials = new NetworkCredential(user, password);
+            client.Credentials = credentials;
+            return client;
+        }
+
 
         public int SendConfirmationEmailConArchivoAniadido(string receiver, string email) {
             /*Random random = new Random();

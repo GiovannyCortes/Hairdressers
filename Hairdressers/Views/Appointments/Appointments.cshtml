@@ -40,6 +40,19 @@
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
+
+            if (@Json.Serialize(services_json) == "[]") { // No podemos ejecutar el seleccionador de citas, sin servicios
+                Swal.fire({
+                    title: "Peluquería sin servicios",
+                    text: "Esta peluquería no tiene servicios activos actualmente. \n" +
+                          "Se deshabilitará la opción de pedir cita hasta que el local " +
+                          "añada nuevos servicios a disposición del cliente.",
+                    icon: "warning",
+                    confirmButtonText: 'De acuerdo',
+                    confirmButtonColor: '#3085d6'
+                });
+            }
+
             var calendarEl = document.getElementById('calendar');
             var today = GetToday();
             var adminPriv = @Json.Serialize(administrator_privileges);
@@ -70,7 +83,7 @@
                 selectMirror: true,
                 businessHours: @if(hairdresser_view) { @Html.Raw(bussiness_hours) } else { @Html.Raw("[]"); } ,
                 select: function (arg) {
-                    if (hairdView) {
+                    if (hairdView && @Json.Serialize(services_json) != "[]") {
                         var inputDate = new Date(arg.startStr);
                         var todayDate = new Date();
                         if (new Date(inputDate.toDateString()).getTime() < new Date(todayDate.toDateString()).getTime()) {
