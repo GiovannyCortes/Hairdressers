@@ -4,6 +4,10 @@ using Hairdressers.Models;
 namespace Hairdressers.Interfaces {
     public interface IRepositoryHairdresser {
 
+        string GenerateToken();
+        Task InsertToken(int user_id, string token);
+        Task<bool> ValidateToken(int user_id, string token);
+
         #region ADMIN
         Task<bool> AdminExistAsync(int hairdresser_id, int user_id);
         Task<Admin?> FindAdminAsync(int hairdresser_id, int user_id);

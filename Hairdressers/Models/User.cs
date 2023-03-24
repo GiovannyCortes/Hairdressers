@@ -32,5 +32,8 @@ namespace Hairdressers.Models {
         [Column("email_validated")]
         public bool EmailConfirmed { get; set; }
 
+        [Column("temp_token")]
+        public string TempToken { get; set; }
+
     }
 }

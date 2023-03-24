@@ -36,6 +36,43 @@ namespace Hairdressers.Repositories {
             this.context = context;
         }
 
+        public string GenerateToken() {
+            const string caracteresPermitidos = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            var token = new string(
+                    Enumerable.Repeat(caracteresPermitidos, 50).Select(s => s[random.Next(s.Length)]).ToArray()
+                );
+            return token;
+        }
+
+        public async Task InsertToken(int user_id, string token) {
+            var consulta = from data in this.context.Users
+                           where data.UserId == user_id
+                           select new User {
+                               TempToken = data.TempToken ?? ""
+                           };
+            User? user = await consulta.FirstOrDefaultAsync();
+            if (user != null) {
+                user.TempToken = token;
+                await this.context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ValidateToken(int user_id, string token) {
+            var consulta = from data in this.context.Users
+                           where data.UserId == user_id
+                           select new User {
+                               TempToken = data.TempToken ?? ""
+                           };
+            User? user = await consulta.FirstOrDefaultAsync();
+            if (user != null && user.TempToken != null) {
+                return user.TempToken == token;
+            } else {
+                return false;
+            }
+        }
+
+
         #region USER
         public async Task<User?> FindUserAsync(int user_id) {
             var consulta = from data in this.context.Users
@@ -49,7 +86,8 @@ namespace Hairdressers.Repositories {
                                LastName = data.LastName,
                                Phone = data.Phone ?? "Sin número de teléfono",
                                Email = data.Email,
-                               EmailConfirmed = data.EmailConfirmed
+                               EmailConfirmed = data.EmailConfirmed,
+                               TempToken = data.TempToken ?? ""
                            };
             return await consulta.FirstOrDefaultAsync();
         }
@@ -66,7 +104,8 @@ namespace Hairdressers.Repositories {
                                LastName = data.LastName,
                                Phone = data.Phone ?? "Sin número de teléfono",
                                Email = data.Email,
-                               EmailConfirmed = data.EmailConfirmed
+                               EmailConfirmed = data.EmailConfirmed,
+                               TempToken = data.TempToken ?? ""
                            };
             User? user = await consulta.FirstOrDefaultAsync();
             if (user == null) {
@@ -80,8 +119,7 @@ namespace Hairdressers.Repositories {
             }
         }
 
-        public async Task<User> InsertUserAsync
-            (string password, string name, string lastname, string phone, string email, bool econfirmed) {
+        public async Task<User> InsertUserAsync (string password, string name, string lastname, string phone, string email, bool econfirmed) {
 
             var newid = this.context.Users.Any() ? this.context.Users.Max(u => u.UserId) + 1 : 1;
             string salt = HelperCryptography.GenerateSalt();
@@ -95,7 +133,8 @@ namespace Hairdressers.Repositories {
                 LastName = lastname,
                 Phone = phone,
                 Email = email,
-                EmailConfirmed = econfirmed
+                EmailConfirmed = econfirmed,
+                TempToken = ""
             };
 
             this.context.Users.Add(user);

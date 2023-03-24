@@ -74,7 +74,7 @@ namespace Hairdressers.Controllers {
         [HttpPost] [ValidateAntiForgeryToken]
         public async Task<IActionResult> Registrer(string Password, string Name, string LastName, string Phone, string Email, bool EmailConfirmed) {
             await this.repo_hairdresser.InsertUserAsync(Password, Name, LastName, Phone, Email, EmailConfirmed);
-            return RedirectToAction("LogIn", "Managed");
+            return RedirectToAction("Index", "Landing");
         }
 
         public IActionResult AccesoDenegado() {

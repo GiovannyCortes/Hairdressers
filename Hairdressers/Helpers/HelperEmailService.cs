@@ -1,13 +1,16 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using static System.Net.WebRequestMethods;
 
 namespace Hairdressers.Helpers {
     public class HelperEmailService {
 
         private IConfiguration configuration;
+        private string image_url;
 
         public HelperEmailService(IConfiguration configuration) {
             this.configuration = configuration;
+            this.image_url = "https://live.staticflickr.com/65535/52768172074_803947c193_h.jpg";
         }
 
         private MailMessage ConfigureMailMessage (string destinatario, string asunto, string mensaje) {
@@ -56,7 +59,49 @@ namespace Hairdressers.Helpers {
             await client.SendMailAsync(mail);
         }
 
-        public async Task SendTemplateRequestAppointment(string cliente, string destinatario, DateTime fecha, TimeSpan hora, string servicios) {
+        public async Task SendTemplateVerificationEmailAsync(string destinatario, string cliente, string token) {
+            string mensaje = $@"
+                <html>
+                <head>
+                    <meta charset='UTF-8'>
+                </head>
+                <body>
+                    <h2 style='text-aling:center;'>
+                        Verificación de cuenta
+                    </h2>
+                    <p style='font-size: 1em;'>
+                        Estimado/a <strong>{cliente}</strong>, <br>
+
+                        Para poder verificar su correo electrónico en la aplicación Cut&Go, haga clic en el siguiente enlace: <br> <br>
+
+                        <a href='https://localhost:7064/User/ValidateEmail?token={token}' style='
+                            text-decoration: none;
+                            background-color: #415073;
+                            color: white;
+                            padding: 10px;
+                            border-radius: 25px;
+                            font-weight: 700;
+                        '>
+                            Verificar email
+                        </a> <br> <br>
+
+                        Después de hacer clic en el enlace, serás redirigido a nuestra página web. <br>
+                        Una vez allí, puedes iniciar sesión con las credenciales que proporcionaste al registrarte. <br> <br>
+
+                        Si no has creado una cuenta en Cut&Go, puedes ignorar este correo electrónico. <br>
+                        Si tienes alguna pregunta o problema, no dudes en contactarnos. <br> <br>
+
+                        Atentamente, <br>
+                        El equipo de Cut&Go
+                    </p> <br>
+                    <img src='{this.image_url}' style='max-height: 150px;'/>
+                </body>
+                </html>";
+
+            await this.SendMailAsync(destinatario, "Cut&Go: Verificación de cuenta", mensaje);
+        }
+
+        public async Task SendTemplateRequestAppointment(string destinatario, string cliente, DateTime fecha, TimeSpan hora, string servicios) {
             string mensaje = @"
                 <html>
                 <head>
@@ -69,6 +114,7 @@ namespace Hairdressers.Helpers {
                     <p>
                         Usuari@ <strong>" + cliente + @"</strong> solicita una cita para el día 
                         <strong>" + fecha.ToShortDateString() + @"</strong> a las <strong>" + hora.ToString() + @"</strong>
+                        
                     </p>
                     <p>
                         Vuelva a ventana de la aplicación e introduzca dicho código para verificar su cuenta

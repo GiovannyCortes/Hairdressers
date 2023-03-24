@@ -86,7 +86,8 @@
             <p>&copy; 2023 Cut&Go. Todos los derechos reservados.</p>
         </div>
     </footer>
-    @if (IsSectionDefined("registrer_script")) { @RenderSection("registrer_script", false) }    
+    @if (IsSectionDefined("user_script")) { @RenderSection("user_script", false) }
+    @if (IsSectionDefined("registrer_script")) { @RenderSection("registrer_script", false) }
     @if (IsSectionDefined("login_script")) { @RenderSection("login_script", false) }
     @if (IsSectionDefined("hairdresser_script")) { @RenderSection("hairdresser_script", false) }
     @if (IsSectionDefined("createhairdresser_script")) { @RenderSection("createhairdresser_script", false) }
