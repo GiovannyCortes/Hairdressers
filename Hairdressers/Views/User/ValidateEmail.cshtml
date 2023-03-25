@@ -1,6 +1,37 @@
-﻿@{
-    ViewData["TITLE"] = "C&G: Cuenta validada";
+﻿@model User
+
+@{
+    ViewData["TITLE"] = "C&G: Validación de cuenta";
+
+    /// 1: Usuario encontrado y validado
+    /// 2: Usuario encontrado pero no validado
+    /// 3: Usuario NO encontrado
+    int? response = (int?)ViewData["RESPONSE"];
+    string message_title = "";
+    if (response == 3) {
+        message_title = "USUARIO NO ENCONTRADO";
+    } else if (response == 2) {
+        message_title = "SE HA PRODUCIDO UN ERROR INESPERADO";
+    } else {
+        message_title = "CUENTA VERIFICADA";
+    }
+
 }
 
 <div id="background"></div>
-<h1 class="commonTitle no_select">CUENTA VERIFICADA</h1>
+
+<h1 class="commonTitle no_select">
+    @message_title
+</h1>
+<div class="message_container">
+    @if (response == 3 || response == 2) {
+        <img src="~/images/pictures/red_cross.jpg" class="no_select" />
+        <p class="no_select"><strong>No se ha podido llevar a cabo la validación del correo electrónico</strong></p>
+        <p class="no_select">Si el problema persiste, por favor, contacte con el servicio técnico</p>
+    } else {
+        <img src="~/images/pictures/green_tick.jpg" class="no_select"/>
+        <p class="no_select"><strong>Su cuenta ha sido dada de alta satisfactoriamente</strong></p>
+        <p class="no_select">A partir de ahora puede disfrutar de todos los beneficios de la plataforma <strong>Cut&Go</strong></p>
+        <p class="no_select" style="margin-top: 10px;"><strong>Nota:</strong> Deberá iniciar sesión de nuevo para terminar de guardar todos los ajustes</p>
+    }
+</div>

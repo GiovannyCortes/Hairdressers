@@ -20,5 +20,8 @@ namespace Hairdressers.Models {
         [Column("postal_code")]
         public int PostalCode { get; set; }
 
+        [Column("token")]
+        public string Token { get; set; }
+
     }
 }

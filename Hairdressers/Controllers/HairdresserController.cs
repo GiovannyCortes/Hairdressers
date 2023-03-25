@@ -31,35 +31,24 @@ namespace Hairdressers.Controllers {
 
         [AuthorizeUsers]
         public IActionResult CreateHairdresser() {
-            User user = HttpContext.Session.GetObject<User>("USER");
-            if (user != null) {
-                return View();
-            } else {
-                return RedirectToAction("DeniedAccess", "Redirect");
-            }
+            return View();
         }
 
-        [ValidateAntiForgeryToken] [HttpPost]
+        [AuthorizeUsers] [ValidateAntiForgeryToken] [HttpPost]
         public async Task<IActionResult> CreateHairdresser(Hairdresser hairdresser, string schedules) {
-            User user = HttpContext.Session.GetObject<User>("USER");
-            if (user != null) {
-                // Insertamos la nueva peluquería 
-                int newHId = await this.repo_hairdresser.InsertHairdresserAsync(hairdresser.Name, hairdresser.Phone, hairdresser.Address, hairdresser.PostalCode, user.UserId);
+            // Insertamos la nueva peluquería 
+            int user_id = int.Parse(HttpContext.User.FindFirst("ID").Value);
+            int newHId = await this.repo_hairdresser.InsertHairdresserAsync(hairdresser.Name, hairdresser.Phone, hairdresser.Address, hairdresser.PostalCode, user_id);
 
-                // Insertamos el horario por defecto 'Horario General'
-                int newSid = await this.repo_hairdresser.InsertScheduleAsync(newHId, "Horario General", true);
-         
-                // Recuperamos la lista de registros del horario
-                List<Schedule_Row> schedules_rows = HelperJson.DeserializeObject<List<Schedule_Row>>(schedules);
-                foreach(Schedule_Row r in schedules_rows) {
-                    await this.repo_hairdresser.InsertScheduleRowsAsync(newSid, r.Start, r.End, r.Monday, r.Tuesday, r.Wednesday, r.Thursday, r.Friday, r.Saturday, r.Sunday);
-                }
-                return RedirectToAction("ControlPanel", "User");
-            } else {
-                ViewData["ERROR_MESSAGE_TITLE"] = "Se ha producido un error inesperado";
-                ViewData["ERROR_MESSAGE_SUBTITLE"] = "Sesión cerrada, usuario no encontrado";
-                return RedirectToAction("Error", "Redirect");
+            // Insertamos el horario por defecto 'Horario General'
+            int newSid = await this.repo_hairdresser.InsertScheduleAsync(newHId, "Horario General", true);
+
+            // Recuperamos la lista de registros del horario
+            List<Schedule_Row> schedules_rows = HelperJson.DeserializeObject<List<Schedule_Row>>(schedules);
+            foreach (Schedule_Row r in schedules_rows) {
+                await this.repo_hairdresser.InsertScheduleRowsAsync(newSid, r.Start, r.End, r.Monday, r.Tuesday, r.Wednesday, r.Thursday, r.Friday, r.Saturday, r.Sunday);
             }
+            return RedirectToAction("ControlPanel", "User");
         }
 
         [ValidateAntiForgeryToken] [HttpPost]
@@ -70,10 +59,30 @@ namespace Hairdressers.Controllers {
 
         public async Task<JsonResult> GetHairdresserSuggestions(string searchString) {
             List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersByFilter(searchString);
-            string prueba = HelperJson.SerializeObject(hairdressers);
-            return Json(prueba);
+            string sugerencias = HelperJson.SerializeObject(hairdressers);
+            return Json(sugerencias);
         }
 
+        [AuthorizeUsers]
+        public async Task<IActionResult> Services(int hairdresserId, string hairdresserName) {
+            List<Service> services = await this.repo_hairdresser.GetServicesByHairdresserAsync(hairdresserId);
+            ViewData["HAIRDRESSER_ID"] = hairdresserId;
+            ViewData["HAIRDRESSER_NAME"] = hairdresserName;
+            return View(services);
+        }
+
+        [AuthorizeUsers]
+        public async Task<IActionResult> AddService(int hairdresser_id, string name, string price, string time) {
+            byte time_in_minutes = (byte)TimeSpan.Parse(time.Replace('.',',')).TotalMinutes;
+            int service_id = await this.repo_hairdresser.InsertServiceAsync(hairdresser_id, name, decimal.Parse(price.Replace('.',',')), time_in_minutes);
+            return Json(service_id);
+        }
+
+        [AuthorizeUsers]
+        public async Task<IActionResult> RemoveService(int service_id) {
+            await this.repo_hairdresser.DeleteServiceAsync(service_id);
+            return Json("OK");
+        }
 
     }
 }

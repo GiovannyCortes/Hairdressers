@@ -11,6 +11,9 @@
     <h1 class="title_form no_select data hide">Editar Peluquería</h1>
     <div class="container_box data">
         <a asp-controller="Appointments" asp-action="Appointments" asp-route-hairdresserId="@Model.HairdresserId" class="btn_appointments">Gestionar Citas</a>
+        <a asp-controller="Hairdresser" asp-action="Services" asp-route-hairdresserId="@Model.HairdresserId" asp-route-hairdresserName="@Model.Name" class="btn_services">
+            Gestionar Servicios
+        </a>
         <div class="btn_container_actions">
             <button class="btn_update btn_showers">Editar peluquería</button>
             <button id="btn_delete" class="btn_danger">Eliminar peluquería</button>

@@ -7,8 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Xml.Linq;
 
-#region PROCEDURES_ADMIN
+#region PROCEDURES
 /*
+
     CREATE PROCEDURE SP_COMPARE_ROLE(@HAIRDRESSER_ID INT, @USER_ID1 INT, @USER_ID2 INT, @RES BIT OUT)
     AS
 	    DECLARE @ROLE_1 INT, @ROLE_2 INT;
@@ -19,6 +20,19 @@ using System.Xml.Linq;
 	    ELSE
 		    SET @RES = 0;
     GO
+
+    CREATE PROCEDURE SP_ASSIGN_TOKEN(@USER_ID INT, @TOKEN NVARCHAR(100))
+    AS
+	    UPDATE USERS SET TEMP_TOKEN = @TOKEN WHERE USER_ID = @USER_ID;
+    GO
+
+    CREATE PROCEDURE SP_GET_HAIRDRESSER_EMAILS (@HAIRDRESSER_ID INT)
+    AS
+	    SELECT EMAIL 
+	    FROM USERS INNER JOIN ADMINS ON ADMINS.user_id = USERS.user_id
+	    WHERE ADMINS.hairdresser_id = 1
+    GO
+
  */
 #endregion
 
@@ -45,7 +59,7 @@ namespace Hairdressers.Repositories {
             return token;
         }
 
-        public async Task InsertToken(int user_id, string token) {
+        public async Task InsertTokenAsync(int user_id, string token) {
             var consulta = from data in this.context.Users
                            where data.UserId == user_id
                            select new User {
@@ -58,7 +72,7 @@ namespace Hairdressers.Repositories {
             }
         }
 
-        public async Task<bool> ValidateToken(int user_id, string token) {
+        public async Task<bool> ValidateTokenAsync(int user_id, string token) {
             var consulta = from data in this.context.Users
                            where data.UserId == user_id
                            select new User {
@@ -145,6 +159,21 @@ namespace Hairdressers.Repositories {
         public bool IsAdmin(int user_id) {
             return this.context.Admins.Any(a => a.UserId == user_id);
         }
+
+        public async Task ValidateEmailAsync(int user_id) {
+            User? user = await this.FindUserAsync(user_id);
+            if (user != null) {
+                user.EmailConfirmed = true; 
+                await this.context.SaveChangesAsync();
+            }
+        }        
+        
+        public async Task AssignTokenAsync(int user_id, string token) {
+            string procedure = "SP_ASSIGN_TOKEN @USER_ID, @TOKEN";
+            SqlParameter pamUserId = new SqlParameter("@USER_ID", user_id);
+            SqlParameter pamToken = new SqlParameter("@TOKEN", token);
+            await this.context.Database.ExecuteSqlRawAsync(procedure, pamUserId, pamToken);
+        }
         #endregion
 
         #region ADMIN
@@ -227,7 +256,8 @@ namespace Hairdressers.Repositories {
                                       Name = data.Name,
                                       Address = data.Address,
                                       PostalCode = data.PostalCode,
-                                      Phone = data.Phone ?? "Sin número de teléfono"
+                                      Phone = data.Phone ?? "Sin número de teléfono",
+                                      Token = data.Token ?? ""
                                   }).ToListAsync();
             return consulta.FirstOrDefault();
         }
@@ -239,7 +269,8 @@ namespace Hairdressers.Repositories {
                                Name = data.Name,
                                Address = data.Address,
                                PostalCode = data.PostalCode,
-                               Phone = data.Phone ?? "Sin número de teléfono"
+                               Phone = data.Phone ?? "Sin número de teléfono",
+                               Token = data.Token
                            };
             return await consulta.ToListAsync();
         }
@@ -264,8 +295,9 @@ namespace Hairdressers.Repositories {
                                         Name = x.Hairdresser.Name,
                                         Address = x.Hairdresser.Address,
                                         PostalCode = x.Hairdresser.PostalCode,
-                                        Phone = x.Hairdresser.Phone ?? "Sin número de teléfono"
-                                  });
+                                        Phone = x.Hairdresser.Phone ?? "Sin número de teléfono",
+                                        Token = x.Hairdresser.Token
+                           });
             return await consulta.ToListAsync();
         }
 
@@ -277,7 +309,8 @@ namespace Hairdressers.Repositories {
                                Name = data.Name,
                                Address = data.Address,
                                PostalCode = data.PostalCode,
-                               Phone = data.Phone ?? "Sin número de teléfono"
+                               Phone = data.Phone ?? "Sin número de teléfono",
+                               Token = data.Token
                            };
             return await consulta.ToListAsync();
 
@@ -290,7 +323,8 @@ namespace Hairdressers.Repositories {
                 Name = name,
                 Phone = phone,
                 Address = address,
-                PostalCode = postal_code
+                PostalCode = postal_code,
+                Token = this.GenerateToken()
             };
             this.context.Hairdressers.Add(hairdresser);
 
@@ -316,6 +350,25 @@ namespace Hairdressers.Repositories {
             if (hairdresser != null) {
                 this.context.Hairdressers.Remove(hairdresser);
                 await this.context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<string> GetHairdresserEmailsAsync(int hairdresser_id) {
+            var correos = await (from usuario in this.context.Users
+                                 join admin in this.context.Admins
+                                 on usuario.UserId equals admin.UserId
+                                 where admin.HairdresserId == hairdresser_id
+                                 select usuario.Email).ToListAsync();
+
+            return string.Join(",", correos);
+        }
+
+        public async Task<bool> CompareHairdresserTokenAsync(int hairdresser_id, string token) {
+            Hairdresser? hairdresser = await this.FindHairdresserAsync(hairdresser_id);
+            if (hairdresser != null) {
+                return hairdresser.Token.Equals(token);
+            } else {
+                return false;
             }
         }
         #endregion
@@ -544,7 +597,8 @@ namespace Hairdressers.Repositories {
                 UserId = user_id,
                 HairdresserId = hairdresser_id,
                 Date = date,
-                Time = time
+                Time = time, 
+                Approved = false
             };
             this.context.Appointments.Add(appointment);
             await this.context.SaveChangesAsync();
@@ -568,6 +622,14 @@ namespace Hairdressers.Repositories {
                     await this.DeleteAppointmentServiceAsync(appointment_id, service);
                 }
                 this.context.Appointments.Remove(appointment);
+                await this.context.SaveChangesAsync();
+            }
+        }
+
+        public async Task ApproveAppointmentAsync(int appointment_id) {
+            Appointment? appointment = await this.FindAppoinmentAsync(appointment_id);
+            if (appointment != null) {
+                appointment.Approved = true;
                 await this.context.SaveChangesAsync();
             }
         }
@@ -601,7 +663,7 @@ namespace Hairdressers.Repositories {
             return services;
         }
 
-        public async Task InsertServiceAsync(int hairdresser_id, string name, decimal price, byte duracion) {
+        public async Task<int> InsertServiceAsync(int hairdresser_id, string name, decimal price, byte duracion) {
             var newid = this.context.Services.Any() ? this.context.Services.Max(a => a.ServiceId) + 1 : 1;
             Service service = new Service {
                 ServiceId = newid, 
@@ -612,6 +674,7 @@ namespace Hairdressers.Repositories {
             };
             this.context.Services.Add(service);
             await this.context.SaveChangesAsync();
+            return newid;
         }
 
         public async Task UpdateServiceAsync(int service_id, string name, decimal price, byte duracion) {

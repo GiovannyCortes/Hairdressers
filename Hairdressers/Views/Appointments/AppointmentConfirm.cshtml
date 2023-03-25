@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["TITLE"] = "C&G: Confirmación de la cita";
+    User? user = ViewData["USER"] as User;
+    Appointment? appointment = ViewData["APPOINTMENT"] as Appointment;
+
+    // 1 - Credenciales correctas, solicitud aprobada
+    // 2 - Cita no encontrada (Posible borrado de cita)
+    // 3 - No tiene permisos, solicitud denegada
+    int? verification = (int?)ViewData["RESPONSE"];
+}
+
+<div id="background"></div>
+
+@if (verification != null && verification.Value == 1) {
+    <h1 class="commonTitle no_select">Cita confirmada</h1>
+    <div class="message_container">
+        <p class="no_select">La cita se ha confirmado satisfactoriamente y se ha informado al usuario vía mail</p>
+        <ul>
+            <li>Usuario: @user.Name @user.LastName</li>
+            <li>Fecha de la cita: @appointment.Date.ToShortDateString()</li>
+            <li>Hora de la cita: @appointment.Time.Hours:@appointment.Time.Minutes</li>
+        </ul>
+    </div>
+} else if (verification != null && verification.Value == 2) {
+    <h1 class="commonTitle no_select">Cita no encontrada</h1>
+    <div class="message_container">
+        <p class="no_select">Es posible que la cita haya sido eliminada</p>
+    </div>
+} else if (verification != null && verification.Value == 3) {
+    <h1 class="commonTitle no_select">No tiene permisos para realizar esta acción</h1>
+    <div class="message_container">
+        <p class="no_select">La cita no ha podido ser confirmada correctamente</p>
+    </div>
+} else {
+    <h1 class="commonTitle no_select">Se ha producido un error inesperado</h1>
+    <div class="message_container">
+        <p class="no_select">Por favor, contacte con el servicio técnico para resolver la incidencia</p>
+    </div>
+}

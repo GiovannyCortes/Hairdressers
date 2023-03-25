@@ -41,7 +41,12 @@
 
         document.addEventListener('DOMContentLoaded', function () {
 
-            if (@Json.Serialize(services_json) == "[]") { // No podemos ejecutar el seleccionador de citas, sin servicios
+            var calendarEl = document.getElementById('calendar');
+            var today = GetToday();
+            var adminPriv = @Json.Serialize(administrator_privileges);
+            var hairdView = @Json.Serialize(hairdresser_view);
+
+            if (hairdView && @Json.Serialize(services_json) == "[]") { // No podemos ejecutar el seleccionador de citas, sin servicios
                 Swal.fire({
                     title: "Peluquería sin servicios",
                     text: "Esta peluquería no tiene servicios activos actualmente. \n" +
@@ -52,11 +57,6 @@
                     confirmButtonColor: '#3085d6'
                 });
             }
-
-            var calendarEl = document.getElementById('calendar');
-            var today = GetToday();
-            var adminPriv = @Json.Serialize(administrator_privileges);
-            var hairdView = @Json.Serialize(hairdresser_view);
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 headerToolbar: {
@@ -104,13 +104,17 @@
                     calendar.unselect();
                 },
                 eventClick: function (arg) {
+                    debugger;
+                    var permission = arg.el.fcSeg.eventRange.def.extendedProps.userPermission;
 
-                    var title = (adminPriv) ? arg.el.fcSeg.eventRange.def.title : "CITA";
-                    var extprops = (adminPriv) ? arg.el.fcSeg.eventRange.def.extendedProps : @Html.Raw("{ description: '' }");
+                    var title = (adminPriv || permission) ? arg.el.fcSeg.eventRange.def.title : "CITA";
+                    var extprops = (adminPriv || permission) ? arg.el.fcSeg.eventRange.def.extendedProps : @Html.Raw("{ description: '' }");
                     var start = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.start);
                     var end = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.end);
 
-                    CreateInfoSwal(title, extprops, start, end, adminPriv);
+                    var privilege = adminPriv || permission;
+
+                    CreateInfoSwal(title, extprops, start, end, privilege);
 
                 },
                 editable: true,
@@ -177,6 +181,8 @@
                                 }
                             });
 					        $("#mySwal_info_container").append(services);
+                        } else {
+                            $("#mySwal_info_container").remove();
                         }
 				    
                     },

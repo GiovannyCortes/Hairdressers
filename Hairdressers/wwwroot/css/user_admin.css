@@ -91,7 +91,7 @@
     padding: 5px;
 }
 
-.btn_container_actions > button, .btn_appointments {
+.btn_container_actions > button, .btn_appointments, .btn_services {
     appearance: none;
     border-radius: 15px;
     box-sizing: border-box;
@@ -116,6 +116,19 @@
 
 .btn_container_actions > button:disabled {
     pointer-events: none;
+}
+
+.btn_services {
+    width: calc(100% - 10px);
+    margin-top: 5px;
+    border: 0.125em solid rgb(0, 125, 6);
+}
+
+.btn_services:hover {
+    color: #ffffff;
+    background-color: rgb(0, 125, 6);
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
 }
 
 .btn_appointments {

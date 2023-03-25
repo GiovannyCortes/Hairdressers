@@ -1,0 +1,52 @@
+﻿.service_table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+.service_table > thead > tr > th:not(:last-child), .service_table > tbody > tr > td:not(:last-child) {
+    border: 1.5px solid rgb(128, 128, 128);
+    padding: 5px;
+    background-color: whitesmoke;
+}
+
+.service_table > thead > tr > th:first-child {
+    width: 60%;
+}
+
+.service_table > thead > tr > th:nth-child(2) {
+    width: 10%;
+}
+
+.service_table > thead > tr > th:nth-child(3) {
+    width: 20%;
+}
+
+.service_table_save_btn, .service_table_delete_btn {
+    color: white;
+    width: calc(100% - 10px);
+    margin: auto 5px;
+    padding: 5px;
+    border: 0;
+    border-radius: 15px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.service_table_save_btn {
+    background-color: forestgreen;
+}
+
+.service_table_delete_btn {
+    background-color: red;
+}
+
+.status_image {
+    max-width: 50px;
+}
+
+#add_row_name, #add_row_price, #add_row_time {
+    width: calc(100% - 10px);
+    font-size: 1em;
+}

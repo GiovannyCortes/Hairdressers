@@ -8,7 +8,7 @@
     src: url("../../fonts/Roboto/Roboto-Regular.ttf");
 }
 
-* {
+* { /* Podríamos meter el no_select global? */
     margin: 0;
     font-family: Roboto;
 }
@@ -86,6 +86,21 @@ h3 {
     background-color: var(--main-blue);
     background-image: url("../images/patrones/PatronTres.png");
     background-size: 100px;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+#background_3 {
+    background-color: rgb(120, 120, 120);
+    background-image: url("../images/pictures/construction.png");
+    background-repeat: no-repeat;
+    background-size: 25vw;
+    background-position-x: 50%;
+    background-position-y: 42%;
     width: 100vw;
     height: 100vh;
     position: fixed;
@@ -211,4 +226,44 @@ h3 {
 
 #calendar h2 {
     text-transform: uppercase;
+}
+
+.message_container {
+    display: inline-block;
+    width: 60vw;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    border-radius: 25px;
+    font-size: 1.15em;
+    background-color: white;
+}
+
+.message_container > img {
+    width: 10vw;
+    max-height: 150px;
+}
+
+.message_container > ul {
+    list-style: none;
+    text-align: start;
+    margin-block: 15px;
+    padding-inline: 0;
+}
+
+.legal_container {
+    margin-block: 20px !important;
+    padding: 20px !important;
+}
+
+.legal_container > p {
+    text-align: justify !important;
+}
+
+.legal_container > h3 {
+    margin-block: 0 15px;
+    padding-block: 10px;
+    font-size: 1.5em;
+    color: white;
+    background-color: var(--main-blue);
 }

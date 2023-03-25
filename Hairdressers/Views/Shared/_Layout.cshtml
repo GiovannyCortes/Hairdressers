@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/css/login.css"/>
     <link rel="stylesheet" href="~/css/hairdresser.css"/>
     <link rel="stylesheet" href="~/css/user_admin.css"/>
+    <link rel="stylesheet" href="~/css/services.css"/>
     <link rel="stylesheet" href="~/css/calendarSwal.css"/>
     <link rel="stylesheet" href="~/css/suggestions.css"/>
     <link rel="icon" type="image/x-icon" href="~/images/logos/Barber_logo_small_white.ico">
@@ -44,40 +45,40 @@
         </div>
     </header>
     @RenderBody()
-    <footer class="footer">
+    <footer class="footer no_select">
         <div class="footer__addr">
             <h1 class="footer__logo no_select">Cut&Go S.A.</h1>
             <h2>Contáctanos</h2>
             <address>
                 C. de Pío Felipe, 12, 28038 Madrid<br>
                 cutandgo.app@gmail.com<br>
-                <a class="footer__btn" href="mailto:example@gmail.com">Enviar email</a>
+                <a class="footer__btn" href="mailto:cutandgo.app@gmail.com">Enviar email</a>
             </address>
         </div>
 
         <ul class="footer__nav">
-            <li class="nav__item">
+@*            <li class="nav__item">
                 <h2 class="nav__title no_select">Peluquerías</h2>
                 <ul class="nav__ul">
                     <li><a href="#">Panel de control</a></li>
                     <li><a href="#">Gestión de citas</a></li>
                     <li><a href="#">Archivos</a></li>
                 </ul>
-            </li>
+            </li>*@
 
             <li class="nav__item">
                 <h2 class="nav__title no_select">Clientes</h2>
                 <ul class="nav__ul">
-                    <li><a href="#">Panel de control</a></li>
-                    <li><a href="#">Mis citas</a></li>
+                    <li><a asp-controller="User" asp-action="ControlPanel">Panel de control</a></li>
+                    <li><a asp-controller="Appointments" asp-action="Appointments">Mis citas</a></li>
                 </ul>
             </li>
 
             <li class="nav__item">
                 <h2 class="nav__title no_select">Legal</h2>
                 <ul class="nav__ul">
-                    <li><a href="#">Política de privacidad</a></li>
-                    <li><a href="#">Términos de uso</a></li>
+                    <li><a asp-controller="Landing" asp-action="PrivatePolicy">Política de privacidad</a></li>
+                    <li><a asp-controller="Landing" asp-action="UseTerms">Términos de uso</a></li>
                 </ul>
             </li>
         </ul>
@@ -93,6 +94,7 @@
     @if (IsSectionDefined("createhairdresser_script")) { @RenderSection("createhairdresser_script", false) }
     @if (IsSectionDefined("calendar_script")) { @RenderSection("calendar_script", false) }
     @if (IsSectionDefined("search_script")) { @RenderSection("search_script", false) }
+    @if (IsSectionDefined("service_script")) { @RenderSection("service_script", false) }
     <script>
         $(document).ready(function() {
             $("#navbar_float").hide();

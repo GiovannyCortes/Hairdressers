@@ -1,0 +1,143 @@
+﻿@model List<Service>
+
+@{
+    ViewData["TITLE"] = "C&G: Servicios";
+    int hairdresser_id = (int)ViewData["HAIRDRESSER_ID"];
+    string hairdresser_name = (string)ViewData["HAIRDRESSER_NAME"];
+}
+
+<div id="background"></div>
+<h1 class="commonTitle no_select">
+    Servicios: @hairdresser_name
+</h1>
+
+<table class="service_table no_select">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Duración aproximada</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Service service in Model) {
+            int hours = service.TiempoAprox / 60;
+            int minutes = service.TiempoAprox % 60;
+            string formated_time = "";
+
+            if (hours == 0) {
+                formated_time = minutes + " min";
+            } else if (minutes == 0) {
+                formated_time = hours + " h";
+            } else {
+                formated_time = hours + "h " + minutes + "min";
+            }
+
+            <tr>
+                <td>@service.Name</td>
+                <td>@service.Price €</td>
+                <td style="text-align: center;">@formated_time</td>
+                <td>
+                    <button class="service_table_delete_btn" data-identificador="@service.ServiceId">
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+        <tr id="add_row">
+            <td>
+                <input type="text" maxlength="50" placeholder="Nuevo servicio..." id="add_row_name" required />
+            </td>
+            <td>
+                <input type="number" step="0.01" placeholder="9.50" id="add_row_price" required />
+            </td>
+            <td>
+                <input type="time" step="300" min="00:05" max="04:00" value="00:30" id="add_row_time" required />
+            </td>
+            <td>
+                <button class="service_table_save_btn">
+                    Guardar
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+@section service_script {
+    <script>
+        $(document).ready(function () {
+            $('.service_table_save_btn').click(function () {
+                var name = $('#add_row_name').val();
+                var price = $('#add_row_price').val();
+                var time = $('#add_row_time').val();
+
+                var formatted_price = parseFloat(price).toFixed(2).replace(".", ",") + " €";
+                var formatted_time = formatTime(time);
+
+                if (name && price && time) {
+                    $.post("/Hairdresser/AddService", {
+                        hairdresser_id: @hairdresser_id,
+                        name: name,
+                        price: price,
+                        time: time
+                    }, function (data) {
+                        // ============================================== DIBUJO ==============================================
+                        var newRow = $('<tr><td>' + name + '</td><td>' + formatted_price + '</td><td style="text-align: center;">' + formatted_time + 
+                                       '</td><td><button class="service_table_delete_btn" data-identificador="' + data + '">Eliminar</button></td></tr>');
+
+
+                        // Agrega la nueva fila justo después de la fila "add_row"
+                        $('#add_row').before(newRow);
+
+                        $('#add_row_name').val('');
+                        $('#add_row_price').val('');
+                        $('#add_row_time').val('00:30');
+
+                        $('#add_row_name').focus();
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Campos incompletos",
+                        text: "Por favor, termine de rellenar todos los campos antes de guardar el servicio",
+                        icon: "warning",
+                        position: "bottom-end",
+                        timer: 3500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+
+            // Cuando se haga clic en un botón "Eliminar"
+            $('table').on('click', '.service_table_delete_btn', function () {
+                var $boton = $(this);
+                var identificador = $boton.data('identificador');
+
+                $.post("/Hairdresser/RemoveService", { service_id: identificador }, function (data) {
+                    // ==================== DIBUJO ====================
+                    $boton.closest('tr').remove();
+                });
+            });
+
+            function formatTime(tiempoString) {
+                var tiempoParts = tiempoString.split(":");
+                var horas = parseInt(tiempoParts[0]);
+                var minutos = parseInt(tiempoParts[1]);
+
+                var formated_time = "";
+
+                if (horas == 0) {
+                    formated_time = minutos + " min";
+                } else if (minutos == 0) {
+                    formated_time = horas + " h";
+                } else {
+                    formated_time = horas + "h " + minutos + "min";
+                }
+
+                return formated_time;
+            }
+
+        });
+
+    </script>
+}

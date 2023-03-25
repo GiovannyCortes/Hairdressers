@@ -41,8 +41,7 @@ var app = builder.Build();
     app.UseMvc(routes => {
         routes.MapRoute(
             name: "default",
-            template: "{controller=User}/{action=ValidateEmail}"
-        //template: "{controller=Landing}/{action=Index}"
+            template: "{controller=Landing}/{action=Index}"
         );
     });
 

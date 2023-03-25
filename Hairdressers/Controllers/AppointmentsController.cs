@@ -11,10 +11,12 @@ using System.Security.Claims;
 namespace Hairdressers.Controllers {
     public class AppointmentsController : Controller {
 
+        private readonly IConfiguration _configuration;
         private IRepositoryHairdresser repo;
 
-        public AppointmentsController(IRepositoryHairdresser repo) {
+        public AppointmentsController(IRepositoryHairdresser repo, IConfiguration configuration) {
             this.repo = repo;
+            this._configuration = configuration;
         }
 
         /*
@@ -67,7 +69,7 @@ namespace Hairdressers.Controllers {
             }
 
             // La lista recuperada es transformada y enviada a la vista para su representación
-            List<Object> appointments_json = await this.GenerateInfoCalendar(appointments, administrator_privileges);
+            List<Object> appointments_json = await this.GenerateInfoCalendar(appointments, administrator_privileges, user_id);
             ViewData["HAIRDRESSER"] = hairdresser;
             ViewData["SERVICES"] = (services != null && services.Count > 0) ? HelperJson.SerializeObject(services) : null;
             ViewData["BUSSINESS_HOURS"] = (bussines_hours != null) ? HelperJson.SerializeObject(bussines_hours) : null;
@@ -82,16 +84,54 @@ namespace Hairdressers.Controllers {
         public async Task<IActionResult> CreateAppointment(string mydata) {
             GetCalendarAppointment appointment = JsonConvert.DeserializeObject<GetCalendarAppointment>(mydata);
 
-            // Creación de la cita
+            // Creación de la cita y recogida de servicios
             int appointment_id = await this.repo.InsertAppointmentAsync(appointment.user_id, appointment.hairdresser_id, appointment.date, appointment.time);
+
+            List<string> services = new List<string>();
+            decimal full_cost_services = 0;
             foreach (int service_id in appointment.services) {
                 await this.repo.InsertAppointmentServiceAsync(appointment_id, service_id);
+                Service service = await this.repo.FindServiceAsync(service_id);
+                services.Add(service.Name);
+                full_cost_services += service.Price;
             }
 
-            // Envío del correo de confirmación
+            // Recogida del resto de datos para el email
+            string concat_emails = await this.repo.GetHairdresserEmailsAsync(appointment.hairdresser_id);
+            string[] emails = concat_emails.Split(',');
 
+            string user_name = HttpContext.User.Identity.Name + " " + HttpContext.User.FindFirst("LAST_NAME").Value;
+            string user_email = HttpContext.User.FindFirst("EMAIL").Value;
+
+            string app_date = appointment.date.ToString("dd/MM/yyyy");
+            string app_time = appointment.time.Hours + ":" + appointment.time.Minutes;
+
+            // Envío del correo de confirmación
+            HelperEmailService sender = new HelperEmailService(this._configuration);
+            Hairdresser hairdresser = await this.repo.FindHairdresserAsync(appointment.hairdresser_id);
+            await sender.SendTemplateRequestAppointment(emails, user_name, user_email, app_date, app_time, services, 
+                                                        full_cost_services, hairdresser.Token, hairdresser.HairdresserId, appointment_id);
 
             return Json("/Appointments/Appointments?hairdresserId=" + appointment.hairdresser_id);
+        }
+
+        public async Task<IActionResult> AppointmentConfirm(string token, int hid, int apid) {
+            bool verification = await this.repo.CompareHairdresserTokenAsync(hid, token);
+            if (verification) {
+                Appointment? appointment = await this.repo.FindAppoinmentAsync(apid);
+                if (appointment != null) { 
+                    await this.repo.ApproveAppointmentAsync(apid);
+                    User? user = await this.repo.FindUserAsync(appointment.UserId);
+                    ViewData["USER"] = user;
+                    ViewData["APPOINTMENT"] = appointment;
+                    ViewData["RESPONSE"] = 1; // Credenciales correctas, solicitud aprobada
+                } else { // Cita no encontrada (Posible borrado de cita)
+                    ViewData["RESPONSE"] = 2;
+                }
+            } else {
+                ViewData["RESPONSE"] = 3; // No tiene permisos, solicitud denegada
+            }
+            return View();
         }
 
         [HttpPost] [AuthorizeUsers]
@@ -105,20 +145,21 @@ namespace Hairdressers.Controllers {
             return View();
         }
 
-        private async Task<List<Object>> GenerateInfoCalendar(List<Appointment> appointments, bool superUser) {
+        private async Task<List<Object>> GenerateInfoCalendar(List<Appointment> appointments, bool superUser, int user_id) {
             List<Object> appointments_json = new List<Object>();
             foreach (Appointment app in appointments) { // Recorremos las citas encontradas en la peluquería
+                bool user_permission = (app.UserId == user_id); // Si son datos de mis propias citas si que puedo verlas
 
-                User? user = (superUser) ? await this.repo.FindUserAsync(app.UserId) : null;
+                User? user = (superUser || user_permission) ? await this.repo.FindUserAsync(app.UserId) : null;
                 List<Service> services = await this.repo.GetServicesByAppointmentAsync(app.AppointmentId);
 
                 int timeAprox = this.GetMinutesByAppointment(services);
-                string price = (superUser) ? this.GetTotalPriceByAppointment(services) : "";
-                string userName = (superUser && user != null) ? user.Name : "CITA";
+                string price = (superUser || user_permission) ? this.GetTotalPriceByAppointment(services) : "";
+                string userName = ((superUser || user_permission) && user != null) ? user.Name : "CITA";
                 string date = app.Date.ToString("yyyy-MM-ddT");
 
                 dynamic services_json = new JObject();
-                if (superUser) { // Solo los super usuarios pueden ver los servicios de las citas
+                if (superUser || user_permission) { // Solo los super usuarios pueden ver los servicios de las citas
                     int serviceCount = 0; // Enumeración de los servicios a realizar en la cita
                     foreach (Service service in services) {
                         serviceCount++;
@@ -133,9 +174,10 @@ namespace Hairdressers.Controllers {
                     start = date + app.Time.ToString(@"hh\:mm") + ":00",
                     end = date + this.CalculateEndAppointment(app.Time, timeAprox),
                     extendedProps = services_json,
-                    description = (superUser) ? ("Precio Total: " + price) : "",
+                    description = (superUser || user_permission) ? ("Precio Total: " + price) : "",
                     appoinmentId = app.AppointmentId,
-                    hairdresserId = app.HairdresserId
+                    hairdresserId = app.HairdresserId,
+                    userPermission = user_permission
                 };
 
                 appointments_json.Add(element); // Almacenamos cada elemento en el JSON a devolver

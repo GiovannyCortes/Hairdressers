@@ -5,8 +5,8 @@ namespace Hairdressers.Interfaces {
     public interface IRepositoryHairdresser {
 
         string GenerateToken();
-        Task InsertToken(int user_id, string token);
-        Task<bool> ValidateToken(int user_id, string token);
+        Task InsertTokenAsync(int user_id, string token);
+        Task<bool> ValidateTokenAsync(int user_id, string token);
 
         #region ADMIN
         Task<bool> AdminExistAsync(int hairdresser_id, int user_id);
@@ -19,6 +19,8 @@ namespace Hairdressers.Interfaces {
 
         #region USER
         bool IsAdmin(int user_id);
+        Task ValidateEmailAsync(int user_id);
+        Task AssignTokenAsync(int user_id, string token);
         Task<User?> FindUserAsync(int user_id);
         Task<User?> ValidateUserAsync(string email, string password);
         Task<User> InsertUserAsync(string password, string name, string lastname, string phone, string email, bool econfirmed);
@@ -32,6 +34,8 @@ namespace Hairdressers.Interfaces {
         Task<int> InsertHairdresserAsync(string name, string phone, string address, int postal_code, int user_id);
         Task UpdateHairdresserAsync(int hairdresser_id, string name, string phone, string address, int postal_code);
         Task DeleteHairdresserAsync(int hairdresser_id);
+        Task<string> GetHairdresserEmailsAsync(int hairdresser_id);
+        Task<bool> CompareHairdresserTokenAsync(int hairdresser_id, string token);
         #endregion
 
         #region SCHEDULE
@@ -60,6 +64,7 @@ namespace Hairdressers.Interfaces {
         Task<int> InsertAppointmentAsync(int user_id, int hairdresser_id, DateTime date, TimeSpan time);
         Task UpdateAppointmentAsync(int appointment_id, DateTime date, TimeSpan time);
         Task DeleteAppointmentAsync(int appointment_id);
+        Task ApproveAppointmentAsync(int appointment_id);
         #endregion
 
         #region SERVICES
@@ -67,7 +72,7 @@ namespace Hairdressers.Interfaces {
         Task<List<Service>> GetServicesByHairdresserAsync(int hairdresser_id);
         Task<List<Service>> GetServicesByAppointmentAsync(int appoinment_id);
         Task<List<Service>> GetServicesByIdentificationAsync(List<int> app_services);
-        Task InsertServiceAsync(int hairdresser_id, string name, decimal price, byte duracion);
+        Task<int> InsertServiceAsync(int hairdresser_id, string name, decimal price, byte duracion);
         Task UpdateServiceAsync(int service_id, string name, decimal price, byte duracion);
         Task DeleteServiceAsync(int service_id);
         #endregion

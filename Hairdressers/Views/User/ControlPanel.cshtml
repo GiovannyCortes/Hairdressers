@@ -59,7 +59,6 @@
             }).then((result) => {
                 if (result.isConfirmed === true) {
                     $.post("/User/SendValidateEmail", function (data) {
-                        //console.log(data);
                         Swal.fire({
                             title: "Correo enviado",
                             text: "Revise su bandeja de entrada y siga las instrucciones",
@@ -69,8 +68,8 @@
                             confirmButtonText: 'De acuerdo',
                             confirmButtonColor: '#3085d6'
                         }).then((second_result) => {
-                            console.log("LogOut");
-                            //$.post("/Managed/LogOut");
+                            $.get("/Managed/LogOut");
+                            window.location.reload();
                         });
                     });
                 }

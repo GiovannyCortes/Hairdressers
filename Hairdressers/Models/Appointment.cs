@@ -20,5 +20,7 @@ namespace Hairdressers.Models {
         [Column("time")]
         public TimeSpan Time { get; set; }
 
+        [Column("approved")]
+        public bool Approved { get; set; }
     }
 }
