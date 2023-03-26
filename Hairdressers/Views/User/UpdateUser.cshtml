@@ -1,0 +1,30 @@
+﻿@model User
+
+@{
+    ViewData["Title"] = "Cut&Go: Actualizar Usuario";
+}
+
+<div id="background"></div>
+<h1 class="title_form no_select">Edición de usuario</h1>
+<div class="container_box mauto no_select">
+    <form method="post">
+        <input type="hidden" name="UserId" value="@Model.UserId" class="form-control" required/>
+        <input type="text" placeholder="Nombre" name="Name" value="@Model.Name" class="form-control" maxlength="50" required />
+        <input type="text" placeholder="Apellidos" name="LastName" value="@Model.LastName" class="form-control" maxlength="50" required/>
+        <input type="text" placeholder="Teléfono" name="Phone" value="@Model.Phone" class="form-control" maxlength="20" required />
+        <input type="text" placeholder="Email" name="Email" value="@Model.Email" class="form-control" maxlength="50" required />
+        <div class="btn_container_submit_cancel">
+            <span></span>
+            <span></span>
+            <button class="form-button form-button-create no_select">
+                Guardar cambios
+            </button>
+            <span></span>
+            <div style="width: 100%;">
+                <a asp-controller="User" asp-action="ControlPanel" class="form-button form-button-cancel no_select">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,105 @@
+﻿@model Schedule
+
+@{
+    ViewData["Title"] = "C&G: Modificar horario";
+    string schedule_rows = (string)ViewData["SCHEDULE_ROWS"];
+    string active = Model.Active.ToString();
+}
+
+<div id="background"></div>
+<div class="mauto">
+    <h1 class="title_form no_select data">Modificar horario</h1>
+    <div class="container_box">
+        <form method="post" id="form_UpdateSchedule" action="UpdateSchedule" style="margin-top: 10px;">
+            <input type="hidden" id="insert_schedules" name="insert_schedules" />
+            <input type="hidden" id="update_schedules" name="update_schedules" />
+
+            <input type="hidden" name="ScheduleId" value="@Model.ScheduleId" />
+            <input type="hidden" name="HairdresserId" value="@Model.HairdresserId" class="form-control" />
+            <input type="hidden" name="PseudoActive" value="@active"/>
+
+            <input type="text" name="Name" value="@Model.Name" class="form-control" />
+            <div id="schedules_container"></div>
+            <div id="form-schedule-add" class="form-schedule">
+                <i class="fa fa-circle-plus"></i>
+            </div>
+            <div class="btn_container_submit_cancel">
+                <span></span>
+                <span></span>
+                <button type="button" onclick="executeSubmit()" class="form-button form-button-create no_select">
+                    Guardar cambios
+                </button>
+                <span></span>
+                <div style="width: 100%;">
+                    <a asp-controller="Hairdresser" asp-action="ControlPanel" asp-route-hid="@Model.HairdresserId" class="form-button form-button-cancel no_select">
+                        Cancelar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section updateSchedule_script {
+    <script src="~/js/schedule_builder.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var scheduleCounter = 1; // Contador para generar un identificador único para cada nuevo horario
+
+            var schedules_rows = @Html.Raw(schedule_rows);
+            for (var i = 0; i < schedules_rows.length; i++) {
+                var schedule_row = schedules_rows[i];
+
+                // Convertir los booleanos a un array de bool
+                var days = [schedule_row.Monday, schedule_row.Tuesday, schedule_row.Wednesday, schedule_row.Thursday, schedule_row.Friday, schedule_row.Saturday, schedule_row.Sunday];
+                ScheduleBuilder(scheduleCounter, schedule_row.Start, schedule_row.End, days, schedule_row.ScheduleRowId);
+                scheduleCounter++; // Incrementar el contador de horarios
+            }
+
+            $("#form-schedule-add").click(function () {
+                ScheduleBuilder(scheduleCounter);
+                scheduleCounter++; // Incrementar el contador de horarios
+            });
+
+        });
+
+        function executeSubmit() {
+            const insert_schedules = collectScheduleData(true);
+            const update_schedules = collectScheduleData(false);
+
+            $("#insert_schedules").val(JSON.stringify(insert_schedules));
+            $("#update_schedules").val(JSON.stringify(update_schedules));
+            
+            $("#form_UpdateSchedule").submit();
+        };
+
+        function collectScheduleData(insert) {
+            const schedules = [];
+            $('div[name^="schedule_"]').each(function () {
+                const current_scheduleRowId = $(this).find('.close_icon').data("scheduleRowId");
+                if ((current_scheduleRowId === 0) === insert) {
+                    const startTime = $(this).find('.form-startTime').val();
+                    const endTime = $(this).find('.form-endTime').val();
+                    const days = [];
+                    $(this).find('.checkbox input:checked').each(function () {
+                        days.push($(this).val());
+                    });
+                    schedules.push({
+                        ScheduleRowId: current_scheduleRowId,
+                        Start: startTime,
+                        End: endTime,
+                        Monday: $.inArray("Monday", days) !== -1,
+                        Tuesday: $.inArray("Tuesday", days) !== -1,
+                        Wednesday: $.inArray("Wednesday", days) !== -1,
+                        Thursday: $.inArray("Thursday", days) !== -1,
+                        Friday: $.inArray("Friday", days) !== -1,
+                        Saturday: $.inArray("Saturday", days) !== -1,
+                        Sunday: $.inArray("Sunday", days) !== -1
+                    });
+                }
+            });
+            return schedules;
+        }
+    </script>
+}

@@ -53,7 +53,7 @@ body::-webkit-scrollbar {
 }
 
 .mauto {
-    margin: auto auto 50px auto;
+    margin: auto auto 50px auto !important;
 }
 
 .commonTitle {
@@ -70,16 +70,35 @@ h3 {
     text-transform: uppercase;
 }
 
-#bkg_video {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    min-height: 100vh;
-    min-width: 100vw;
-    z-index: -1;
-    -webkit-filter: opacity(0.5);
-    filter: opacity(0.5);
+@media screen and (orientation: landscape) and (max-width: 1300px) {
+    #bkg_video {
+        position: absolute;
+        left: 0;
+        bottom: 50%;
+        transform: translateY(42%);
+        min-height: 100vh;
+        min-width: 100vw;
+        z-index: -1;
+        -webkit-filter: opacity(0.5);
+        filter: opacity(0.5);
+    }
 }
+
+@media screen and (orientation: landscape) and (min-width: 1300px) {
+    #bkg_video {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        min-height: 100vh;
+        min-width: 100vw;
+        z-index: -1;
+        -webkit-filter: opacity(0.5);
+        filter: opacity(0.5);
+    }
+}
+
+
+
 
 /* ARREGLAR ESTOS BACKGROUND PARA NO DUPLICAR CÓDIGO */
 #background {

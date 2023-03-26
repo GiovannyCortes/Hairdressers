@@ -27,10 +27,8 @@ namespace Hairdressers.Controllers {
                 Phone = HttpContext.User.FindFirst("PHONE").Value
             };
 
-            if (HttpContext.User.FindFirst(ClaimTypes.Role).Value == "ADMIN") {
-                List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersAsync(user.UserId);
-                ViewData["HAIRDRESSERS"] = hairdressers;
-            }
+            List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersAsync(user.UserId);
+            ViewData["HAIRDRESSERS"] = hairdressers;
 
             return View(user);
         }
@@ -66,5 +64,25 @@ namespace Hairdressers.Controllers {
                 return View();
             }
         }
+
+        [AuthorizeUsers]
+        public async Task<IActionResult> UpdateUser() {
+            User? user = await this.repo_hairdresser.FindUserAsync(int.Parse(HttpContext.User.FindFirst("ID").Value));
+            return View(user);
+        }
+        
+        [AuthorizeUsers] [HttpPost]
+        public async Task<IActionResult> UpdateUser(User user) {
+            bool existe = false;
+            if (HttpContext.User.FindFirst("EMAIL").Value != user.Email) {
+                existe = await this.repo_hairdresser.EmailExist(user.Email);
+            }
+
+            if (user != null && !existe) {
+                await this.repo_hairdresser.UpdateUserAsync(user.UserId, user.Name, user.LastName, user.Phone, user.Email);
+            }
+            return RedirectToAction("LogOut", "Managed");
+        }
+
     }
 }

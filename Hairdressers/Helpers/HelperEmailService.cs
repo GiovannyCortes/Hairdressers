@@ -1,7 +1,7 @@
-﻿using NuGet.Common;
+﻿using Hairdressers.Models;
+using NuGet.Common;
 using System.Net;
 using System.Net.Mail;
-using static System.Net.WebRequestMethods;
 
 namespace Hairdressers.Helpers {
     public class HelperEmailService {
@@ -106,6 +106,29 @@ namespace Hairdressers.Helpers {
             await this.SendMailAsync(destinatario, "Cut&Go: Verificación de cuenta", mensaje);
         }
 
+        public async Task SendConfirmationAppointment(string destinatario, string cliente, string fecha, string hora) {
+            string mensaje = $@"
+                <html>
+                <head>
+                    <meta charset='UTF-8'>
+                </head>
+                <body>
+                    <h2 style='text-aling:center;'>
+                        ¡Cita confirmada {cliente}!
+                    </h2>
+                    <p>
+                        Desde <strong>Cut&Go</strong> le informamos que su cita para el día 
+                        <strong>{fecha}</strong> a las <strong>{hora}</strong> ha sido confirmada
+                        por parte del establecimiento.
+                    </p>
+                    <p>Una vez más le damos las gracias por confiar en nuestro servicio y le informamos de que
+                       si tiene alguna duda por favor no dude en contactarnos: cutandgo.app@gmail.com</p>
+                    <center><img src='{this.image_url}' style='max-height: 150px;'/></center>
+                </body>
+                </html>";
+            await this.SendMailAsync(destinatario, "Cut&Go: Confirmación de cita", mensaje);
+        }
+
         public async Task SendTemplateRequestAppointment
             (string[] destinatarios, string cliente, string email, string fecha, string hora, 
             List<string> servicios, decimal coste, string token, int hairdresser_id, int appointment_id) {
@@ -132,7 +155,7 @@ namespace Hairdressers.Helpers {
                         para realizar los siguientes servicios:
                     </p>
                     <ul>{services}</ul>
-                    <p>Coste Total: {coste}</p>
+                    <p>Coste Total: {coste} €</p>
                     <p>Puede confirmar la cita pulsando el botón de más abajo, desde la aplicación o contactando directamente con el usuario</p> <br>
                     <center>
                         <a href='{this.local}/Appointments/AppointmentConfirm?token={token}&hid={hairdresser_id}&apid={appointment_id}' style='

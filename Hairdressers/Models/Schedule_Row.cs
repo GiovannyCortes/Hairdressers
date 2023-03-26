@@ -11,9 +11,6 @@ namespace Hairdressers.Models {
         [Column("schedule_id")]
         public int ScheduleId { get; set; }
 
-        [ForeignKey(nameof(ScheduleId))]
-        public virtual Schedule Schedule { get; set; }
-
         [Column("start_time")]
         public TimeSpan Start { get; set; }
         

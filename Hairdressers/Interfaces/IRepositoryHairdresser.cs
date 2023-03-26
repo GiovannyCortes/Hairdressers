@@ -18,12 +18,14 @@ namespace Hairdressers.Interfaces {
         #endregion
 
         #region USER
-        bool IsAdmin(int user_id);
+        Task<bool> IsAdmin(int user_id);
+        Task<bool> EmailExist(string email);
         Task ValidateEmailAsync(int user_id);
         Task AssignTokenAsync(int user_id, string token);
         Task<User?> FindUserAsync(int user_id);
         Task<User?> ValidateUserAsync(string email, string password);
         Task<User> InsertUserAsync(string password, string name, string lastname, string phone, string email, bool econfirmed);
+        Task UpdateUserAsync(int user_id, string name, string lastname, string phone, string email);
         #endregion
 
         #region HAIRDRESSER
@@ -41,7 +43,7 @@ namespace Hairdressers.Interfaces {
         #region SCHEDULE
         Task<List<string>> GetNameSchedulesAsync(int hairdresser_id);
         Task<List<Schedule>> GetSchedulesAsync(int hairdresser_id, bool getrows);
-        Task<Schedule?> FindScheduleAsync(int schedule_id);
+        Task<Schedule?> FindScheduleAsync(int schedule_id, bool getrows);
         Task<Schedule?> FindActiveScheduleAsync(int hairdresser_id);
         Task<int> InsertScheduleAsync(int hairdresser_id, string name, bool active);
         Task UpdateScheduleAsync(int schedule_id, int hairdresser_id, string name, bool active);
@@ -80,6 +82,7 @@ namespace Hairdressers.Interfaces {
         #region APPOINTMENT_SERVICES
         Task<Appointment_Service?> FindAppointmentServiceAsync(int appointment_id, int service_id);
         Task<List<int>> GetAppointmentServiceAsync(int appointment_id);
+        Task<List<Appointment_Service>> GetObjectAppointmentServiceAsync(int appointment_id);
         Task InsertAppointmentServiceAsync(int appointment_id, int service_id);
         Task DeleteAppointmentServiceAsync(int appointment_id, int service_id);
         #endregion

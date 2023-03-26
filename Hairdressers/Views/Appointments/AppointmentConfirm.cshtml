@@ -2,7 +2,10 @@
     ViewData["TITLE"] = "C&G: Confirmación de la cita";
     User? user = ViewData["USER"] as User;
     Appointment? appointment = ViewData["APPOINTMENT"] as Appointment;
-
+    string app_time = "";
+    if (appointment != null) {
+        app_time = appointment.Time.Hours.ToString().PadLeft(2, '0') + ":" + appointment.Time.Minutes.ToString().PadLeft(2, '0');
+    }
     // 1 - Credenciales correctas, solicitud aprobada
     // 2 - Cita no encontrada (Posible borrado de cita)
     // 3 - No tiene permisos, solicitud denegada
@@ -14,11 +17,12 @@
 @if (verification != null && verification.Value == 1) {
     <h1 class="commonTitle no_select">Cita confirmada</h1>
     <div class="message_container">
+        <img src="~/images/pictures/green_tick.jpg" class="no_select" />
         <p class="no_select">La cita se ha confirmado satisfactoriamente y se ha informado al usuario vía mail</p>
         <ul>
             <li>Usuario: @user.Name @user.LastName</li>
             <li>Fecha de la cita: @appointment.Date.ToShortDateString()</li>
-            <li>Hora de la cita: @appointment.Time.Hours:@appointment.Time.Minutes</li>
+            <li>Hora de la cita: @app_time</li>
         </ul>
     </div>
 } else if (verification != null && verification.Value == 2) {

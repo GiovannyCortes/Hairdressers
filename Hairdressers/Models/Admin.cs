@@ -11,7 +11,7 @@ namespace Hairdressers.Models {
         public int UserId { get; set; }
         
         [Column("role")]
-        public int Role { get; set; }
+        public byte Role { get; set; }
 
         [ForeignKey(nameof(HairdresserId))]
         public virtual Hairdresser Hairdresser { get; set; }

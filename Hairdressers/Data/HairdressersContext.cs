@@ -22,10 +22,10 @@ namespace Hairdressers.Data {
             modelBuilder.Entity<Appointment_Service>()
                 .HasKey(a => new { a.AppointmentId, a.ServiceId });
 
-            modelBuilder.Entity<Schedule>()
-                .HasMany(s => s.ScheduleRows)
-                .WithOne(s => s.Schedule)
-                .HasForeignKey(sr => sr.ScheduleId);
+            modelBuilder.Entity<Service>()
+                .Property(s => s.Price)
+                .HasPrecision(5, 2);
+
         }
 
     }

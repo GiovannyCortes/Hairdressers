@@ -89,21 +89,17 @@ namespace Hairdressers.Repositories {
 
         #region USER
         public async Task<User?> FindUserAsync(int user_id) {
-            var consulta = from data in this.context.Users
-                           where data.UserId == user_id
-                           select new User {
-                               UserId = data.UserId,
-                               Salt = data.Salt,
-                               Password = data.Password,
-                               PasswordRead = data.PasswordRead,
-                               Name = data.Name,
-                               LastName = data.LastName,
-                               Phone = data.Phone ?? "Sin número de teléfono",
-                               Email = data.Email,
-                               EmailConfirmed = data.EmailConfirmed,
-                               TempToken = data.TempToken ?? ""
-                           };
-            return await consulta.FirstOrDefaultAsync();
+            var user = await this.context.Users
+                           .Where(u => u.UserId == user_id)
+                           .FirstOrDefaultAsync();
+
+            if (user != null) {
+                user.LastName = user.LastName ?? "";
+                user.Phone = user.Phone ?? "Sin número de teléfono";
+                user.TempToken = user.TempToken ?? "";
+            }
+
+            return user;
         }
 
         public async Task<User?> ValidateUserAsync(string email, string password) {
@@ -134,7 +130,6 @@ namespace Hairdressers.Repositories {
         }
 
         public async Task<User> InsertUserAsync (string password, string name, string lastname, string phone, string email, bool econfirmed) {
-
             var newid = this.context.Users.Any() ? this.context.Users.Max(u => u.UserId) + 1 : 1;
             string salt = HelperCryptography.GenerateSalt();
 
@@ -156,8 +151,23 @@ namespace Hairdressers.Repositories {
             return user;
         }
 
-        public bool IsAdmin(int user_id) {
-            return this.context.Admins.Any(a => a.UserId == user_id);
+        public async Task UpdateUserAsync(int user_id, string name, string lastname, string phone, string email) {
+            User? user = await this.FindUserAsync(user_id);
+            if (user != null) {
+                user.Name = name;
+                user.LastName = lastname;
+                user.Phone = phone;
+                user.Email = email;
+                await this.context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> IsAdmin(int user_id) {
+            return await this.context.Admins.AnyAsync(a => a.UserId == user_id);
+        }
+
+        public async Task<bool> EmailExist(string email) {
+            return await this.context.Users.AnyAsync(a => a.Email == email);
         }
 
         public async Task ValidateEmailAsync(int user_id) {
@@ -214,7 +224,7 @@ namespace Hairdressers.Repositories {
                 Admin new_admin = new Admin {
                     HairdresserId = hairdresser_id,
                     UserId = user_id,
-                    Role = (int)role
+                    Role = (byte)role
                 };
                 this.context.Admins.Add(new_admin);
                 await this.context.SaveChangesAsync();
@@ -225,7 +235,7 @@ namespace Hairdressers.Repositories {
         public async Task<int> UpdateAdminAsync(int hairdresser_id, int user_id, AdminRole role) {
             Admin? admin = await this.FindAdminAsync(hairdresser_id, user_id);
             if (admin != null) {
-                admin.Role = (int)role;
+                admin.Role = (byte)role;
                 await this.context.SaveChangesAsync();
                 return (int)ServerRes.OK;
             } else { return (int)ServerRes.RecordNotFound; }
@@ -249,17 +259,10 @@ namespace Hairdressers.Repositories {
 
         #region HAIRDRESSER
         public async Task<Hairdresser?> FindHairdresserAsync(int hairdresser_id) {
-            var consulta = await (from data in this.context.Hairdressers
-                                  where data.HairdresserId == hairdresser_id
-                                  select new Hairdresser {
-                                      HairdresserId = data.HairdresserId,
-                                      Name = data.Name,
-                                      Address = data.Address,
-                                      PostalCode = data.PostalCode,
-                                      Phone = data.Phone ?? "Sin número de teléfono",
-                                      Token = data.Token ?? ""
-                                  }).ToListAsync();
-            return consulta.FirstOrDefault();
+            var hairdresser = await this.context.Hairdressers
+                                    .Where(h => h.HairdresserId == hairdresser_id)
+                                    .FirstOrDefaultAsync();
+            return hairdresser;
         }
 
         public async Task<List<Hairdresser>> GetHairdressersAsync() {
@@ -309,7 +312,7 @@ namespace Hairdressers.Repositories {
                                Name = data.Name,
                                Address = data.Address,
                                PostalCode = data.PostalCode,
-                               Phone = data.Phone ?? "Sin número de teléfono",
+                               Phone = data.Phone ?? "",
                                Token = data.Token
                            };
             return await consulta.ToListAsync();
@@ -348,6 +351,45 @@ namespace Hairdressers.Repositories {
         public async Task DeleteHairdresserAsync(int hairdresser_id) {
             Hairdresser? hairdresser = await this.FindHairdresserAsync(hairdresser_id);
             if (hairdresser != null) {
+                /// 1 - Borrar los registros de Admin
+                List<Admin> admins = await this.GetAdminsAsync(hairdresser_id);
+                foreach (Admin admin in admins) {
+                    this.context.Admins.Remove(admin);
+                }
+                await this.context.SaveChangesAsync();
+
+                /// 2 - Borrar los registros de Horario
+                List<Schedule> schedules = await this.GetSchedulesAsync(hairdresser_id, false);
+                foreach (Schedule schedule in schedules) {
+                    List<Schedule_Row> schedule_Rows = await this.GetScheduleRowsAsync(schedule.ScheduleId);
+                    foreach (Schedule_Row schedule_Row in schedule_Rows) {
+                        this.context.Schedule_Rows.Remove(schedule_Row);
+                    }
+                    await this.context.SaveChangesAsync();
+                    this.context.Schedules.Remove(schedule);
+                }
+                await this.context.SaveChangesAsync();
+
+                /// 3 - Borrar los registros de citas y sus relaciones con servicios
+                List<Appointment> appointments = await this.GetAppointmentsByHairdresserAsync(hairdresser_id);
+                foreach (Appointment appointment in appointments) {
+                    List<Appointment_Service> appointment_Services = await this.GetObjectAppointmentServiceAsync(appointment.AppointmentId);
+                    foreach (Appointment_Service appointment_Service in appointment_Services) {
+                        this.context.AppointmentServices.Remove(appointment_Service);
+                    }
+                    await this.context.SaveChangesAsync();
+                    this.context.Appointments.Remove(appointment);
+                }
+                await this.context.SaveChangesAsync();
+
+                /// 4 - Borrar los registros de servicios
+                List<Service> services = await this.GetServicesByHairdresserAsync(hairdresser_id);
+                foreach (Service service in services) {
+                    this.context.Services.Remove(service);
+                }
+                await this.context.SaveChangesAsync();
+
+                /// 5 - Eliminar la peluquería
                 this.context.Hairdressers.Remove(hairdresser);
                 await this.context.SaveChangesAsync();
             }
@@ -397,11 +439,18 @@ namespace Hairdressers.Repositories {
             return schedules;
         }
 
-        public async Task<Schedule?> FindScheduleAsync(int schedule_id) {
+        public async Task<Schedule?> FindScheduleAsync(int schedule_id, bool getrows) {
             var consulta = from data in this.context.Schedules
                            where data.ScheduleId == schedule_id
                            select data;
-            return await consulta.FirstOrDefaultAsync();
+            Schedule? schedule = await consulta.FirstOrDefaultAsync();
+            if (schedule != null && getrows) {
+                List<Schedule_Row> schedule_rows = await this.GetScheduleRowsAsync(schedule.ScheduleId);
+                foreach (Schedule_Row row in schedule_rows) {
+                    schedule.ScheduleRows.Add(row);
+                }
+            }
+            return schedule;
         }
         
         public async Task<Schedule?> FindActiveScheduleAsync(int hairdresser_id) {
@@ -433,7 +482,7 @@ namespace Hairdressers.Repositories {
         }
 
         public async Task UpdateScheduleAsync(int schedule_id, int hairdresser_id, string name, bool active) {
-            Schedule? schedule = await this.FindScheduleAsync(schedule_id);
+            Schedule? schedule = await this.FindScheduleAsync(schedule_id, false);
             if (schedule != null) {
                 schedule.Name = name;
                 schedule.Active = active;
@@ -450,8 +499,12 @@ namespace Hairdressers.Repositories {
         }
 
         public async Task DeleteScheduleAsync(int schedule_id) {
-            Schedule? schedule = await this.FindScheduleAsync(schedule_id);
+            Schedule? schedule = await this.FindScheduleAsync(schedule_id, true);
             if (schedule != null) {
+                foreach (Schedule_Row srow in schedule.ScheduleRows) {
+                    this.context.Schedule_Rows.Remove(srow);
+                    await this.context.SaveChangesAsync();
+                }
                 this.context.Schedules.Remove(schedule);
                 await this.context.SaveChangesAsync();
             }
@@ -503,20 +556,31 @@ namespace Hairdressers.Repositories {
                     row.Sunday == schedule_row.Sunday
                 ) { return (int)Validates.Duplicado; }
 
-                int start_compare_start = TimeSpan.Compare(schedule_row.Start, row.Start);
-                int start_compare_end = TimeSpan.Compare(schedule_row.Start, row.End);
-                int end_compare_start = TimeSpan.Compare(schedule_row.End, row.Start);
-                int end_compare_end = TimeSpan.Compare(schedule_row.End, row.End);
-
                 if (
-                    row.ScheduleRowId != schedule_row.ScheduleRowId && (
-                        start_compare_start == 0 ||                                                         // Los inicios igual al rango
-                        (start_compare_start == 1 && start_compare_end == -1) ||                            // El inicio está entre los rangos
-                        (start_compare_start == 1 && (end_compare_end == 0 || end_compare_end == -1)) ||    // Inicio correcto, final menor o igual al rango
-                        (start_compare_start == -1 && (end_compare_start == 1 && end_compare_end == -1)) || // Inicio correcto, final entre rangos
-                        (start_compare_start == -1 && (end_compare_end == 0 || end_compare_end == 1))       // Inicio correcto, final superior al rango
-                    )
-                ) { return (int)Validates.Rango_Sobreescrito; }
+                    (row.Monday & row.Monday == schedule_row.Monday) |
+                    (row.Tuesday & row.Tuesday == schedule_row.Tuesday) |
+                    (row.Wednesday & row.Wednesday == schedule_row.Wednesday) |
+                    (row.Thursday & row.Thursday == schedule_row.Thursday) |
+                    (row.Friday & row.Friday == schedule_row.Friday) |
+                    (row.Saturday & row.Saturday == schedule_row.Saturday) |
+                    (row.Sunday & row.Sunday == schedule_row.Sunday)
+                ) { // SOLO COMPROBAREMOS EL SOLAPAMIENTO DE TIEMPOS SI HAY COMO MÍNIMO UN DÍA COINCIDENTE
+                    int start_compare_start = TimeSpan.Compare(schedule_row.Start, row.Start);
+                    int start_compare_end = TimeSpan.Compare(schedule_row.Start, row.End);
+                    int end_compare_start = TimeSpan.Compare(schedule_row.End, row.Start);
+                    int end_compare_end = TimeSpan.Compare(schedule_row.End, row.End);
+
+                    if (
+                        row.ScheduleRowId != schedule_row.ScheduleRowId && (
+                            start_compare_start == 0 ||                                                         // Los inicios igual al rango
+                            (start_compare_start == 1 && start_compare_end == -1) ||                            // El inicio está entre los rangos
+                            (start_compare_start == 1 && (end_compare_end == 0 || end_compare_end == -1)) ||    // Inicio correcto, final menor o igual al rango
+                            (start_compare_start == -1 && (end_compare_start == 1 && end_compare_end == -1)) || // Inicio correcto, final entre rangos
+                            (start_compare_start == -1 && (end_compare_end == 0 || end_compare_end == 1))       // Inicio correcto, final superior al rango
+                        )
+                    ) { return (int)Validates.Rango_Sobreescrito; }
+                }
+
             }
             return (int)Validates.Ok;
         }
@@ -705,6 +769,13 @@ namespace Hairdressers.Repositories {
             var consulta = from data in this.context.AppointmentServices
                            where data.AppointmentId == appointment_id
                            select data.ServiceId;
+            return await consulta.ToListAsync();
+        }
+        
+        public async Task<List<Appointment_Service>> GetObjectAppointmentServiceAsync(int appointment_id) {
+            var consulta = from data in this.context.AppointmentServices
+                           where data.AppointmentId == appointment_id
+                           select data;
             return await consulta.ToListAsync();
         }
 

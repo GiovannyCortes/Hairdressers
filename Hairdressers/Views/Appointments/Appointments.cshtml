@@ -27,6 +27,7 @@
     }
 
     Hairdresser? hairdresser = (ViewData["HAIRDRESSER"] != null) ? ViewData["HAIRDRESSER"] as Hairdresser : null;
+    string h_token = (hairdresser != null)? hairdresser.Token : "";
     User current_user = ViewData["USER"] as User; 
     bool administrator_privileges = (bool)TempData["ADMIN_PRIV"];
     bool hairdresser_view = (bool)TempData["HAIRDRESSER_VIEW"];
@@ -112,9 +113,7 @@
                     var start = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.start);
                     var end = GetTimeFromISODate(arg.el.fcSeg.eventRange.instance.range.end);
 
-                    var privilege = adminPriv || permission;
-
-                    CreateInfoSwal(title, extprops, start, end, privilege);
+                    CreateInfoSwal(title, extprops, start, end, adminPriv, permission, hairdView);
 
                 },
                 editable: true,
@@ -158,7 +157,9 @@
                 return horas + ":" + (minutos < 10 ? "0" : "") + minutos;
             }
 
-            function CreateInfoSwal(title, extprops, start, end, adminPriv) {
+            function CreateInfoSwal(title, extprops, start, end, adminPriv, permission, hairdView) {
+                var privilege = adminPriv || permission;
+                var allow_confirm = hairdView && adminPriv;
                 Swal.fire({
                     html: "<h2 id='mySwal_info_title'>" + title + "</h2>" +
                           "<p class='mySwal_info no_select'>Hora: <b>" + start + "</b> - <b>" + end + "</b></p>" +
@@ -166,14 +167,17 @@
                           "<p class='mySwal_info no_select'>" + extprops.description + "</p>",
 				    confirmButtonText: 'Eliminar cita',
                     confirmButtonColor: '#d33',
-				    showConfirmButton: adminPriv,
-				    showDenyButton: true,
-                    denyButtonText: 'De acuerdo',
-                    denyButtonColor: '#415073',
+                    showConfirmButton: privilege,
+				    showCancelButton: true,
+                    cancelButtonText: 'De acuerdo',
+                    cancelButtonColor: '#415073',
+                    showDenyButton: allow_confirm,
+                    denyButtonText: 'Confirmar Cita',
+                    denyButtonColor: '#e7ac00',
                     reverseButtons: true,
 				    didRender: function () {
 
-                        if (adminPriv) {
+                        if (privilege) {
                             var services = '';
                             $.each(extprops, function (key, value) {
                                 if (key.indexOf('service_') === 0) {
@@ -187,6 +191,15 @@
 				    
                     },
                     preConfirm: function () {
+                        return new Promise(function (resolve) {
+                            resolve({
+                                permission: privilege,
+                                appointmentId: extprops.appoinmentId,
+                                hairdresserId: extprops.hairdresserId
+                            });
+                        });
+                    },
+                    preDeny: function () {
                         return new Promise(function (resolve) {
                             resolve({
                                 permission: adminPriv,
@@ -207,7 +220,12 @@
                                 window.location.reload();
                             })
                         });
-				    }
+                    } else if (result.isDenied && result.value.permission) {
+                        $.post("/Appointments/AppointmentConfirm", { token: "@h_token", hid: result.value.hairdresserId, apid: result.value.appointmentId, redirect: true },
+                        function (data) {
+                                window.location.reload();
+                        });
+                    }
 			    });
             }
 
@@ -296,7 +314,6 @@
                             var fechaHora = new Date(fechaString[0], fechaString[1] - 1, fechaString[2], horaString[0], horaString[1]);
 
                             if (fecha <= fechaActual) {
-                                debugger;
                                 var horaLimite = new Date(ahora.getTime() + (15 * 60 * 1000));
                                 var horalimiteString = (horaLimite.getMinutes().toString().length == 1 ? "0" : "") + (horaLimite.getMinutes() + 1);
                                 if (fechaHora < horaLimite) {

@@ -2,7 +2,6 @@
 using Hairdressers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Hairdressers.helpers;
-using Hairdressers.Extensions;
 using Hairdressers.Filters;
 
 namespace Hairdressers.Controllers {
@@ -51,12 +50,19 @@ namespace Hairdressers.Controllers {
             return RedirectToAction("ControlPanel", "User");
         }
 
-        [ValidateAntiForgeryToken] [HttpPost]
+        [AuthorizeUsers] [ValidateAntiForgeryToken] [HttpPost]
         public async Task<IActionResult> UpdateHairdresser(Hairdresser hairdresser) {
-            //await this.repo_hairdresser.UpdateHairdresserAsync
-            return RedirectToAction("ControlPanel", "Hairdresser");
+            await this.repo_hairdresser.UpdateHairdresserAsync(hairdresser.HairdresserId, hairdresser.Name, hairdresser.Phone, hairdresser.Address, hairdresser.PostalCode);
+            return RedirectToAction("ControlPanel", "Hairdresser", new { hid = hairdresser.HairdresserId });
         }
 
+        [AuthorizeUsers]
+        public async Task<IActionResult> DeleteHairdresser(int hairdresser_id) {
+            await this.repo_hairdresser.DeleteHairdresserAsync(hairdresser_id);
+            return Json("/User/ControlPanel");
+        }
+
+        [AuthorizeUsers]
         public async Task<JsonResult> GetHairdresserSuggestions(string searchString) {
             List<Hairdresser> hairdressers = await this.repo_hairdresser.GetHairdressersByFilter(searchString);
             string sugerencias = HelperJson.SerializeObject(hairdressers);
@@ -81,6 +87,42 @@ namespace Hairdressers.Controllers {
         [AuthorizeUsers]
         public async Task<IActionResult> RemoveService(int service_id) {
             await this.repo_hairdresser.DeleteServiceAsync(service_id);
+            return Json("OK");
+        }
+
+        [AuthorizeUsers]
+        public async Task<IActionResult> UpdateSchedule(int hairdresser_id, int schedule_id) {
+            Schedule? schedule = await this.repo_hairdresser.FindScheduleAsync(schedule_id, true);
+
+            List<Schedule_Row> schedule_Rows = new List<Schedule_Row>();
+            foreach (Schedule_Row row in schedule.ScheduleRows) {
+                schedule_Rows.Add(row);
+            }
+
+            string rows = HelperJson.SerializeObject(schedule_Rows);
+            ViewData["SCHEDULE_ROWS"] = rows;
+            return View(schedule);
+        }
+
+        [AuthorizeUsers] [HttpPost]
+        public async Task<IActionResult> UpdateSchedule(Schedule schedule, string PseudoActive, string insert_schedules, string update_schedules) {
+            await this.repo_hairdresser.UpdateScheduleAsync(schedule.ScheduleId, schedule.HairdresserId, schedule.Name, (PseudoActive == "True"));
+
+            List<Schedule_Row> insert_schedules_rows = HelperJson.DeserializeObject<List<Schedule_Row>>(insert_schedules);
+            foreach (Schedule_Row r in insert_schedules_rows) {
+                await this.repo_hairdresser.InsertScheduleRowsAsync(schedule.ScheduleId, r.Start, r.End, r.Monday, r.Tuesday, r.Wednesday, r.Thursday, r.Friday, r.Saturday, r.Sunday);
+            }
+
+            List<Schedule_Row> update_schedules_rows = HelperJson.DeserializeObject<List<Schedule_Row>>(update_schedules);
+            foreach (Schedule_Row r in update_schedules_rows) {
+                await this.repo_hairdresser.UpdateScheduleRowsAsync(r.ScheduleRowId, r.Start, r.End, r.Monday, r.Tuesday, r.Wednesday, r.Thursday, r.Friday, r.Saturday, r.Sunday);
+            }
+            return RedirectToAction("ControlPanel", "Hairdresser", new { hid = schedule.HairdresserId });
+        }
+
+        [AuthorizeUsers]
+        public async Task<ActionResult> DeleteScheduleRow(int scheduleRow_id) {
+            await this.repo_hairdresser.DeleteScheduleRowsAsync(scheduleRow_id);
             return Json("OK");
         }
 

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "C&G: Panel de control";
     List<Schedule>? schedules = ViewData["SCHEDULES"] as List<Schedule>;
+    string phone_info = (Model.Phone == "") ? "Sin número de telefono" : Model.Phone;
 }
 
 <div id="background"></div>
@@ -20,21 +21,16 @@
         </div>
         <div>
             <p>@Model.Address</p>
-            <p>@Model.Phone</p>
+            <p>@phone_info</p>
         </div>
         @if (schedules != null) {
             <div class="cb_section_2" >
                 @foreach (Schedule sche in schedules) {
                     <div class="schedule_item no_select">
-                        <h2>@sche.Name</h2>
-                        @foreach (Schedule_Row row in sche.ScheduleRows) {
-                            string days = FormatDays(row.Monday, row.Tuesday, row.Wednesday, row.Thursday, row.Friday, row.Saturday, row.Sunday);
-                            <ul class="schedule_item_list">
-                                <li>@row.Start.ToString(@"hh\:mm")</li>
-                                <li>@row.End.ToString(@"hh\:mm")</li>
-                                <li>@days</li>
-                            </ul>
-                        }
+                        <a asp-controller="Hairdresser" asp-action="UpdateSchedule" asp-route-hairdresser_id="@Model.HairdresserId" asp-route-schedule_id="@sche.ScheduleId">
+                            @sche.Name
+                        </a>
+                        @Html.Raw(GetScheduleHtml(sche.ScheduleRows.ToList()))
                     </div>
                 }
             </div>
@@ -43,6 +39,7 @@
     <div class="container_box data hide">
         <form method="post" action="UpdateHairdresser" style="margin-top: 10px;">
             @Html.AntiForgeryToken()
+            <input type="hidden" name="HairdresserId" value="@Model.HairdresserId" />
             <input type="text" name="Name" id="h_name" class="form-control" maxlength="60" placeholder="Nombre" value="@Model.Name" />
             <div class="form_div_flex">
                 <input type="text" id="h_address" name="Address" class="form-control" maxlength="100" placeholder="Dirección" value="@Model.Address" />
@@ -88,14 +85,13 @@
                     title: "¿Está segur@@ de que desea eliminar esta peluquería?",
                     text: "Esta acción no podrá revertirse",
                     icon: "warning",
+                    confirmButtonText: "Sí, eliminar",
+                    confirmButtonColor: "#cb0000",
                     showCancelButton: true,
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        $.ajax({
-                            url: "/Landing/Index",
-                            success: function (res) {
-                                window.location = "/Landing/Index";
-                            }
+                        $.post("/Hairdresser/DeleteHairdresser", { hairdresser_id: @Model.HairdresserId }, function (url_Redirect) { 
+                            window.location.replace(url_Redirect); // Replace bloqueará la acción de volver atrás
                         });
                     }
                 });
@@ -105,40 +101,96 @@
 }
 
 @functions {
-    public string FormatDays(bool monday, bool tuesday, bool wednesday, bool thursday, bool friday, bool saturday, bool sunday) {
-        var dayNames = new List<string> { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
-        var selectedDays = new List<string>();
+    //public string FormatDays(bool monday, bool tuesday, bool wednesday, bool thursday, bool friday, bool saturday, bool sunday) {
+    //    var dayNames = new List<string> { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+    //    var selectedDays = new List<string>();
 
-        if (monday) selectedDays.Add("Lunes");
-        if (tuesday) selectedDays.Add("Martes");
-        if (wednesday) selectedDays.Add("Miércoles");
-        if (thursday) selectedDays.Add("Jueves");
-        if (friday) selectedDays.Add("Viernes");
-        if (saturday) selectedDays.Add("Sábado");
-        if (sunday) selectedDays.Add("Domingo");
+    //    if (monday) selectedDays.Add("Lunes");
+    //    if (tuesday) selectedDays.Add("Martes");
+    //    if (wednesday) selectedDays.Add("Miércoles");
+    //    if (thursday) selectedDays.Add("Jueves");
+    //    if (friday) selectedDays.Add("Viernes");
+    //    if (saturday) selectedDays.Add("Sábado");
+    //    if (sunday) selectedDays.Add("Domingo");
 
-        if (selectedDays.Count == 1) { // Un único día
-            return selectedDays[0];
-        } else if (selectedDays.Count == 2) { // Dos días
-            return $"{selectedDays[0]} y {selectedDays[1]}";
-        } else if (selectedDays.Count > 2) {
-            bool consecutives = true;
-            for (int i = 0; i < selectedDays.Count; i++) {
-                if (i != 0 && !checkConsecutiveDays(selectedDays[i], selectedDays[i-1])) { consecutives = false; }
+    //    if (selectedDays.Count == 1) { // Un único día
+    //        return selectedDays[0];
+    //    } else if (selectedDays.Count == 2) { // Dos días
+    //        return $"{selectedDays[0]} y {selectedDays[1]}";
+    //    } else if (selectedDays.Count > 2) {
+    //        bool consecutives = true;
+    //        for (int i = 0; i < selectedDays.Count; i++) {
+    //            if (i != 0 && !checkConsecutiveDays(selectedDays[i], selectedDays[i-1])) { consecutives = false; }
+    //        }
+    //        if (consecutives) {
+    //            return $"De {selectedDays.First()} a {selectedDays.Last()}";
+    //        } else {
+    //            return string.Join(", ", selectedDays);
+    //        }
+    //    }
+    //    return "No hay días seleccionados";
+    //}
+
+    //private bool checkConsecutiveDays(string day1, string day2) {
+    //    var dayNames = new[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
+    //    int index1 = Array.IndexOf(dayNames, day1);
+    //    int index2 = Array.IndexOf(dayNames, day2);
+    //    return Math.Abs(index1 - index2) == 1 || Math.Abs(index1 - index2) == 6; // Cálculo de diferencia circular entre 2 días
+    //}
+
+    public string GetScheduleHtml(List<Schedule_Row> rows) {
+        // Crear un diccionario que mapee los días de la semana a una lista de franjas horarias
+        Dictionary<string, List<string>> schedule = new Dictionary<string, List<string>>();
+        schedule["Lunes"] = new List<string>();
+        schedule["Martes"] = new List<string>();
+        schedule["Miércoles"] = new List<string>();
+        schedule["Jueves"] = new List<string>();
+        schedule["Viernes"] = new List<string>();
+        schedule["Sábado"] = new List<string>();
+        schedule["Domingo"] = new List<string>();
+
+        // Iterar por cada fila de horario y agregar la franja horaria correspondiente al día
+        foreach (Schedule_Row row in rows) {
+            string formatted_start = row.Start.ToString(@"hh\:mm");
+            string formatted_end = row.End.ToString(@"hh\:mm");
+
+            if (row.Monday) {
+                schedule["Lunes"].Add(formatted_start + " - " + formatted_end);
             }
-            if (consecutives) {
-                return $"De {selectedDays.First()} a {selectedDays.Last()}";
-            } else {
-                return string.Join(", ", selectedDays);
+            if (row.Tuesday) {
+                schedule["Martes"].Add(formatted_start + " - " + formatted_end);
+            }
+            if (row.Wednesday) {
+                schedule["Miércoles"].Add(formatted_start + " - " + formatted_end);
+            }
+            if (row.Thursday) {
+                schedule["Jueves"].Add(formatted_start + " - " + formatted_end);
+            }
+            if (row.Friday) {
+                schedule["Viernes"].Add(formatted_start + " - " + formatted_end);
+            }
+            if (row.Saturday) {
+                schedule["Sábado"].Add(formatted_start + " - " + formatted_end);
+            }
+            if (row.Sunday) {
+                schedule["Domingo"].Add(formatted_start + " - " + formatted_end);
             }
         }
-        return "No hay días seleccionados";
+
+        // Crear la cadena HTML con los horarios para cada día de la semana
+        StringBuilder sb = new StringBuilder();
+        foreach (KeyValuePair<string, List<string>> entry in schedule) {
+            sb.Append("<div class='schedule_day'>");
+            sb.Append("<h3>" + entry.Key + "</h3>");
+            sb.Append("<ul>");
+            foreach (string timeSlot in entry.Value) {
+                sb.Append("<li>" + timeSlot + "</li>");
+            }
+            sb.Append("</ul>");
+            sb.Append("</div>");
+        }
+
+        return sb.ToString();
     }
 
-    private bool checkConsecutiveDays(string day1, string day2) {
-        var dayNames = new[] { "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo" };
-        int index1 = Array.IndexOf(dayNames, day1);
-        int index2 = Array.IndexOf(dayNames, day2);
-        return Math.Abs(index1 - index2) == 1 || Math.Abs(index1 - index2) == 6; // Cálculo de diferencia circular entre 2 días
-    }
 }

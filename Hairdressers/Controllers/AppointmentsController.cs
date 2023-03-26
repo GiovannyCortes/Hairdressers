@@ -104,7 +104,7 @@ namespace Hairdressers.Controllers {
             string user_email = HttpContext.User.FindFirst("EMAIL").Value;
 
             string app_date = appointment.date.ToString("dd/MM/yyyy");
-            string app_time = appointment.time.Hours + ":" + appointment.time.Minutes;
+            string app_time = appointment.time.Hours.ToString().PadLeft(2, '0') + ":" + appointment.time.Minutes.ToString().PadLeft(2, '0');
 
             // Envío del correo de confirmación
             HelperEmailService sender = new HelperEmailService(this._configuration);
@@ -115,13 +115,19 @@ namespace Hairdressers.Controllers {
             return Json("/Appointments/Appointments?hairdresserId=" + appointment.hairdresser_id);
         }
 
-        public async Task<IActionResult> AppointmentConfirm(string token, int hid, int apid) {
+        public async Task<IActionResult> AppointmentConfirm(string token, int hid, int apid, bool redirect = false) {
             bool verification = await this.repo.CompareHairdresserTokenAsync(hid, token);
             if (verification) {
                 Appointment? appointment = await this.repo.FindAppoinmentAsync(apid);
                 if (appointment != null) { 
                     await this.repo.ApproveAppointmentAsync(apid);
                     User? user = await this.repo.FindUserAsync(appointment.UserId);
+
+                    HelperEmailService sender = new HelperEmailService(this._configuration);
+                    string app_date = appointment.Date.ToString("dd/MM/yyyy");
+                    string app_time = appointment.Time.Hours.ToString().PadLeft(2, '0') + ":" + appointment.Time.Minutes.ToString().PadLeft(2, '0');
+                    await sender.SendConfirmationAppointment(user.Email, user.Name + " " + user.LastName, app_date, app_time);
+
                     ViewData["USER"] = user;
                     ViewData["APPOINTMENT"] = appointment;
                     ViewData["RESPONSE"] = 1; // Credenciales correctas, solicitud aprobada
@@ -131,7 +137,8 @@ namespace Hairdressers.Controllers {
             } else {
                 ViewData["RESPONSE"] = 3; // No tiene permisos, solicitud denegada
             }
-            return View();
+
+            return (redirect)? Json("OK") : View();
         }
 
         [HttpPost] [AuthorizeUsers]
@@ -168,11 +175,14 @@ namespace Hairdressers.Controllers {
                         services_json.Add(propertyName, finalValue);
                     }
                 }
+                
+                string color = (app.Approved) ? "300ab10" : "#df9b23";
 
                 var element = new {
                     title = userName,
                     start = date + app.Time.ToString(@"hh\:mm") + ":00",
                     end = date + this.CalculateEndAppointment(app.Time, timeAprox),
+                    color = color,
                     extendedProps = services_json,
                     description = (superUser || user_permission) ? ("Precio Total: " + price) : "",
                     appoinmentId = app.AppointmentId,

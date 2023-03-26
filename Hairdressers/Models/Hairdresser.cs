@@ -12,7 +12,7 @@ namespace Hairdressers.Models {
         public string Name { get; set; }
         
         [Column("number_phone")]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         
         [Column("address")]
         public string Address { get; set; }
@@ -21,7 +21,7 @@ namespace Hairdressers.Models {
         public int PostalCode { get; set; }
 
         [Column("token")]
-        public string Token { get; set; }
+        public string? Token { get; set; }
 
     }
 }

@@ -28,7 +28,7 @@ namespace Hairdressers.Controllers {
                         ClaimTypes.Name, ClaimTypes.Role
                 );
 
-                string admin = (this.repo_hairdresser.IsAdmin(user.UserId)) ? "ADMIN" : "CLIENT";
+                string admin = await this.repo_hairdresser.IsAdmin(user.UserId) ? "ADMIN" : "CLIENT";
 
                 Claim claimUserID = new Claim("ID", user.UserId.ToString());
                 Claim claimUserName = new Claim(ClaimTypes.Name, user.Name);

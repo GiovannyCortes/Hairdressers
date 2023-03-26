@@ -9,9 +9,9 @@
     <form method="post" class="main_forms">
         @Html.AntiForgeryToken()
         <label class="login-label" for="email-control-login">Email</label><br />
-        <input type="email" id="email-control-login" class="login-control" name="email" value="giovannyandresch@gmail.com" maxlength="50" required />
+        <input type="email" id="email-control-login" class="login-control" name="email" maxlength="50" value="cutandgo.app@gmail.com" required />
         <br /><label class="login-label" for="password-control-login">Contraseña</label><br />
-        <input type="password" id="password-control-login" class="login-control pass-item" name="password" value="MCSD2022" maxlength="50" required />
+        <input type="password" id="password-control-login" class="login-control pass-item" name="password" maxlength="50" value="MCSD2022" required />
         <i id="password-control-login-i" class="fa fa-eye togglePassword" onClick="VisibilityPassword()"></i>
         @if (login_status != null) {
             <h3 class="form-error-message">@login_status</h3>

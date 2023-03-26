@@ -21,10 +21,10 @@ namespace Hairdressers.Models {
         public string Name { get; set; }
         
         [Column("last_name")]
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         
         [Column("number_phone")]
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
         
         [Column("email")]
         public string Email { get; set; }
@@ -33,7 +33,7 @@ namespace Hairdressers.Models {
         public bool EmailConfirmed { get; set; }
 
         [Column("temp_token")]
-        public string TempToken { get; set; }
+        public string? TempToken { get; set; }
 
     }
 }

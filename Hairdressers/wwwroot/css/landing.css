@@ -5,17 +5,51 @@
     user-select: none;
 }
 
-@media screen and (orientation: landscape) and (max-width: 1300px) and (max-height: 700px) {
+@media screen and (orientation: portrait) and (max-width: 700px) {
     #landing_content {
         width: 90vw;
         margin-inline: auto;
-        height: clamp(340px, calc(100vh - 180px), 1080px);
+        height: clamp(340px, calc(100vh - 150px), 1080px);
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 1fr;
         grid-template-areas: "sidetext";
         grid-gap: 0px;
         overflow: hidden;
+    }
+
+    #landing_aside > p {
+        color: white;
+        text-align: justify;
+        padding-inline: 30px;
+        font-size: 1em;
+        padding-inline: 30px;
+    }
+
+    #description_content p {
+        font-size: 10pt;
+    }
+}
+
+@media screen and (orientation: landscape) and (max-width: 1300px) and (max-height: 700px) {
+    #landing_content {
+        width: 90vw;
+        margin-inline: auto;
+        margin-bottom: 20px;
+        height: clamp(340px, calc(100vh - 130px), 1080px);
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "sidetext";
+        grid-gap: 0px;
+        overflow: hidden;
+    }
+
+    #landing_aside > p {
+        color: white;
+        text-align: justify;
+        padding-inline: 30px;
+        font-size: 1.25em;
     }
 
     #description_content p {
@@ -27,13 +61,21 @@
     #landing_content {
         width: 90vw;
         margin-inline: auto;
-        height: clamp(340px, calc(100vh - 180px), 1080px);
+        margin-bottom: 20px;
+        height: clamp(340px, calc(100vh - 150px), 1080px);
         display: grid;
         grid-template-columns: 1fr;
         grid-template-rows: 1fr;
         grid-template-areas: "sidetext";
         grid-gap: 0px;
         overflow: hidden;
+    }
+
+    #landing_aside > p {
+        color: white;
+        text-align: justify;
+        padding-inline: 30px;
+        font-size: 1.25em;
     }
 
     #description_content p {
@@ -45,13 +87,21 @@
     #landing_content {
         width: 90vw;
         margin-inline: auto;
-        height: clamp(340px, calc(100vh - 180px), 1080px);
+        margin-bottom: 20px;
+        height: clamp(340px, calc(100vh - 150px), 1080px);
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr;
         grid-template-areas: "sidetext x";
         grid-gap: 120px;
         overflow: hidden;
+    }
+
+    #landing_aside > p {
+        color: white;
+        text-align: justify;
+        padding-inline: 30px;
+        font-size: 1.25em;
     }
 
     #description_content p {
@@ -63,13 +113,21 @@
     #landing_content {
         width: 90vw;
         margin-inline: auto;
-        height: clamp(340px, calc(100vh - 180px), 1080px);
+        margin-bottom: 20px;
+        height: clamp(340px, calc(100vh - 150px), 1080px);
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr;
         grid-template-areas: "sidetext x";
         grid-gap: 120px;
         overflow: hidden;
+    }
+
+    #landing_aside > p {
+        color: white;
+        text-align: justify;
+        padding-inline: 30px;
+        font-size: 1.25em;
     }
 
     #description_content p {
@@ -100,7 +158,7 @@
     overflow: hidden;
 }
 
-#description_content > button {
+#description_content > a {
     width: 50%;
     padding: 10px 15px;
     border: 0;
@@ -109,6 +167,7 @@
     text-align: center;
     color: white;
     background-color: var(--main-blue);
+    text-decoration: none;
     font-weight: bold;
     cursor: pointer;
     transition-duration: 200ms;
@@ -116,15 +175,16 @@
     margin: 15px auto 0 auto;
 }
 
-#description_content > button:hover {
+#description_content > a:hover {
     box-shadow: 0 2px 5px 1px rgba(100, 100, 100, 0.8);
     background-color: var(--main-red);
 }
 
-#landing_aside{
+#landing_aside {
     background-color: var(--main-blue);
-    height: 500px;
     width: 100vw;
+    height: 550px;
+    overflow: hidden;
 }
 
 #landing_aside > h1 {
@@ -133,4 +193,11 @@
     text-align: center;
     font-size: 40px;
     color: white;
+}
+
+#landing_aside > img {
+    width: 100vw;
+    height: 400px;
+    object-fit: cover;
+    margin-top: 20px;
 }
